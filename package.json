@@ -1,0 +1,22 @@
+{
+  "name": "general-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Google Workspace automation templates for operations teams",
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "scripts": {
+    "build": "node dev/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "tsc -p jsconfig.json && node dev/check.mjs && npm test && npm run build && node dev/build.mjs --check",
+    "setup": "node dev/setup.mjs",
+    "clasp": "clasp"
+  },
+  "devDependencies": {
+    "@google/clasp": "3.4.1",
+    "@types/google-apps-script": "2.0.13",
+    "googleapis": "176.0.0",
+    "typescript": "7.0.2"
+  }
+}
