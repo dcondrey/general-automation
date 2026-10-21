@@ -87,6 +87,46 @@ const Book = {
   },
 };
 
+const RunLog = {
+  HEADERS: ['Started', 'Action', 'Status', 'Seconds', 'What happened'],
+
+  record(name, started, status, detail) {
+    const sh = Book.sheet('Run log', RunLog.HEADERS);
+    if (sh.getLastRow() > 501) sh.deleteRows(2, sh.getLastRow() - 501);
+    Book.append('Run log', RunLog.HEADERS, [[new Date(started), name, status, (Date.now() - started) / 1000, detail.slice(0, 500)]]);
+  },
+
+  run(name, fn) {
+    const started = Date.now();
+    let result;
+    try {
+      result = Book.locked(fn);
+    } catch (error) {
+      try { Book.locked(() => RunLog.record(name, started, 'Needs attention', 'Action stopped. Use Fix setup problems and check Issues.')); }
+      catch (_) { console.error('Could not record the failed action. Check workbook access.'); }
+      throw error;
+    }
+    try { Book.locked(() => RunLog.record(name, started, 'Done', result && result.summary || 'Completed.')); }
+    catch (_) {
+      throw new OperatorError('The action completed, but the Run log could not be updated. Check the results before retrying; restore Run log headings if they changed.');
+    }
+    return result;
+  },
+};
+
+function operatorAction_(name, fn) {
+  try {
+    const result = RunLog.run(name, fn);
+    Book.open().toast(result.summary, 'Automations', 10);
+    return result;
+  } catch (error) {
+    const message = error instanceof OperatorError ? error.message :
+      'This action could not finish. Check Settings, Run log, Google permissions, and workbook access. If it persists, ask the workbook owner to inspect Apps Script → Executions.';
+    SpreadsheetApp.getUi().alert('Automations needs attention', message, SpreadsheetApp.getUi().ButtonSet.OK);
+    return { error: message };
+  }
+}
+
 const Backlog = {
   HEADERS: ['Department', 'Process', 'Owner', 'Runs/week', 'Minutes/run', 'People/run', 'Error rate %', 'Rework min/error', 'Needed?', 'Redesign first?', 'Automatable %', 'Build hours', 'Status', 'Measured hours/week saved', 'Measured on', 'Notes', 'Upkeep min/week', 'Overlap group', 'Source ID'],
   OUTPUT: ['Rank', 'Department', 'Process', 'Owner', 'Recommendation', 'Current hours/week', 'Potential hours/week', 'Implementation hours', 'Payback weeks', 'Annual capacity value', 'Measured hours/week saved', 'Measured on', 'Assumptions', 'Backlog row', 'Source ID'],
@@ -287,33 +327,6 @@ const Settings = {
     if (!opts.files) throw new OperatorError('Preview mode is on. To create a Form or Doc, set Settings → Create Google files to Yes, then run this action again.');
     if (opts.source === 'Demo') throw new OperatorError('Choose My backlog in Settings before creating files. The demo stays inside this workbook.');
     return opts;
-  },
-};
-
-const RunLog = {
-  HEADERS: ['Started', 'Action', 'Status', 'Seconds', 'What happened'],
-
-  record(name, started, status, detail) {
-    const sh = Book.sheet('Run log', RunLog.HEADERS);
-    if (sh.getLastRow() > 501) sh.deleteRows(2, sh.getLastRow() - 501);
-    Book.append('Run log', RunLog.HEADERS, [[new Date(started), name, status, (Date.now() - started) / 1000, detail.slice(0, 500)]]);
-  },
-
-  run(name, fn) {
-    const started = Date.now();
-    let result;
-    try {
-      result = Book.locked(fn);
-    } catch (error) {
-      try { Book.locked(() => RunLog.record(name, started, 'Needs attention', 'Action stopped. Use Fix setup problems and check Issues.')); }
-      catch (_) { console.error('Could not record the failed action. Check workbook access.'); }
-      throw error;
-    }
-    try { Book.locked(() => RunLog.record(name, started, 'Done', result && result.summary || 'Completed.')); }
-    catch (_) {
-      throw new OperatorError('The action completed, but the Run log could not be updated. Check the results before retrying; restore Run log headings if they changed.');
-    }
-    return result;
   },
 };
 
@@ -654,19 +667,6 @@ function onOpen() {
     .addSeparator()
     .addItem('Fix setup problems', 'checkSetup')
     .addToUi();
-}
-
-function operatorAction_(name, fn) {
-  try {
-    const result = RunLog.run(name, fn);
-    Book.open().toast(result.summary, 'Automations', 10);
-    return result;
-  } catch (error) {
-    const message = error instanceof OperatorError ? error.message :
-      'This action could not finish. Check your Google permissions and workbook access, then choose Fix setup problems. If it persists, ask the workbook owner to inspect Apps Script → Executions.';
-    SpreadsheetApp.getUi().alert('Automations needs attention', message, SpreadsheetApp.getUi().ButtonSet.OK);
-    return { error: message };
-  }
 }
 
 function setupWorkbook() { return operatorAction_('Set up workbook', Template.setup); }

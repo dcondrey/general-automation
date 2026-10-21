@@ -1,0 +1,8 @@
+<!doctype html>
+<html><head><base target="_top"><style>body{font:14px Arial;padding:16px;color:#15213d}label,input,select,button{display:block;margin:12px 0;width:100%;box-sizing:border-box}input,select,button{padding:10px}button{background:#15213d;color:white;border:0;border-radius:4px}p{line-height:1.5}</style></head><body>
+<p>Credentials are stored privately for your Google login and this workbook. They are never written to cells or returned to this sidebar.</p>
+<label>Service<select id="service"><option>Slack webhook</option><option>Gemini API key</option><option>Asana token</option></select></label>
+<label>Credential<input id="secret" type="password" autocomplete="off" spellcheck="false"></label>
+<button id="save" type="button">Save connection</button><p id="result" role="status"></p>
+<script>document.getElementById('save').onclick=function(){const button=this;button.disabled=true;const input=document.getElementById('secret'),value=input.value;input.value='';google.script.run.withSuccessHandler(function(message){document.getElementById('result').textContent=message;button.disabled=false;}).withFailureHandler(function(){document.getElementById('result').textContent='Could not save. Check the service and credential format, then try again.';button.disabled=false;}).saveConnection(document.getElementById('service').value,value);};</script>
+</body></html>

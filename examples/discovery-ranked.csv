@@ -1,0 +1,7 @@
+"Rank","Department","Process","Owner","Recommendation","Current hours/week","Potential hours/week","Implementation hours","Payback weeks","Annual capacity value","Measured hours/week saved","Measured on","Assumptions","Backlog row","Source ID"
+"1","Brand Management","Copy weekly metrics into a second status sheet","Brand lead","Delete","5","5","0.5","0.1","10800","","","","2","demo-1"
+"2","Supply Chain","Reconcile inventory exports","Supply chain lead","Automate","7.666666666666667","6.133333333333334","8","1.3043478260869565","13248.000000000002","","","","3","demo-2"
+"3","Client Services","Assemble weekly client reports","Account lead","Automate","5.083333333333333","3.8125","10","2.622950819672131","8235","3.5","2026-01-15","","5","demo-4"
+"4","Catalog","Chase missing inputs before a listing update","Catalog lead","Redesign first","4.833333333333333","2.9","12","4.137931034482759","6263.999999999999","","","Potential only; validate after redesign","4","demo-3"
+"5","Operations","Prepare a sensitive exception decision","Operations lead","Keep manual","1","0","2","","0","","","","6","demo-5"
+"6","Finance","Reconcile an unclear duplicate report","Finance lead","Investigate","1","","8","","","","","Effort assumed: 8h; Discovery needed; savings excluded","7","demo-6"

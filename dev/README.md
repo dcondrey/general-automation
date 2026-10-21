@@ -24,17 +24,19 @@ The pinned clasp development dependency currently inherits [GHSA-vfj7-8cjw-p6xm]
    npm run clasp -- login
    ```
 
-3. Create the bound workbook and push its generated bundle:
+3. Create the chosen bound workbook and push its generated bundle:
 
    ```sh
-   npm run setup
+   npm run setup -- discovery
    npm run clasp -- open-container
    ```
 
 4. Reload the workbook. Choose **Automations → Set up workbook** and approve Google's runtime consent. Google service permissions are separate from the developer CLI login.
 5. Follow [the live acceptance checklist](../docs/validation.md). Publish a template copy link only after these checks pass.
 
-An existing `.clasp.json` is reused. Before the script is created, `.google-setup.json` checkpoints the workbook ID so an API-access failure can be retried without creating another workbook. Both files are local and ignored. Inspect the saved target before updating any remote project. Subsequent source updates use `npm run build` and `npm run clasp -- push`; a running workbook does not automatically receive source changes from GitHub. Copies also remain independent.
+Use `marketplace`, `sorter`, or `handoffs` instead of `discovery` for the other templates. Each has a separate `dist/<suite>/` bundle and `.clasp.<suite>.json` binding; Discovery keeps `.clasp.json` for compatibility. Setup prints the correct command to open that suite's container.
+
+An existing binding is reused. Before the script is created, a local `.google-setup[.<suite>].json` checkpoints the workbook ID so an API-access failure can be retried without creating another workbook. Both binding and checkpoint files are ignored. Inspect the saved target before updating any remote project. Setup uses the official Drive and Apps Script APIs for creation and clasp for source upload; it never deletes a remote project. Subsequent updates use `npm run setup -- <suite>` to build and push that suite. A running workbook does not automatically receive source changes from GitHub. Copies also remain independent.
 
 The root `.clasp.json` is ignored, as are credential files. Never commit OAuth tokens, client secrets, live Backlog exports, or real responses. `assets/social-banner.png` is the supplied 1280×640 GitHub social preview image; upload it in repository Settings → General → Social preview if desired. GitHub does not set the repository social image from a README image.
 

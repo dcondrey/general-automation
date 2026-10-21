@@ -1,0 +1,9 @@
+{
+  "data": {
+    "name": "Prepare updated product listing",
+    "notes": "Automation handoff key: demo-handoff-1\nNext team: Catalog\nSKU: DEMO-PET\nASIN: B000000001\nAssets: https://example.com/demo-assets\n\nFictional package dimensions are ready.",
+    "projects": [
+      "123456789"
+    ]
+  }
+}

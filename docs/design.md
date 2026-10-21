@@ -36,4 +36,14 @@ Each suite will be a separately bundled template. The Discovery bundle has curre
 
 The build explicitly lists the release files, concatenates them without third-party runtime code, and copies the explicit manifest. Generated output is checked into Git for inspection and reproducibility. A developer installs a bound script once; operators copy and use the workbook through its menu. A publicly copyable template must contain only synthetic data and must pass the live validation checklist first.
 
+## Additional suite contracts
+
+Marketplace Watch validates an entire snapshot before updating derived output. Dated inbound is eligible only if it arrives before initial stock depletion; missing or stale evidence cannot resolve a prior business signal. Signal keys retain acknowledgements and snoozes. A digest marks intent before sending and holds an uncertain delivery rather than retrying automatically.
+
+AI Sorter separates the deterministic baseline from live model suggestions. A request identity covers input, labels, model, and prompt version. Intent is recorded before generation; interrupted or invalid output stays held. Generation is limited to two new items per run. The cost gate uses provider-counted prompt tokens and configured rates with a capped output allowance; it remains an estimate, not a billing guarantee. Predictions are suggestions and cannot call business tools. Evaluation compares the current classifier and baseline on the same matching human-labeled examples.
+
+Team Handoffs validates the receiving team's inputs before any creation request. Optional source tasks must be confirmed complete. A source-derived key and payload fingerprint prevent a repeated run or changed payload from blindly creating another task. Unknown writes are reconciled through a bounded, paginated destination search for an exact marker. No match is not proof of non-delivery, so it never silently authorizes a second write.
+
+Integration credentials use user properties namespaced by workbook ID. They are not shared with other editors or reused by copied containers. These three suites have separate current-spreadsheet, HTTP, and sidebar permission bundles; none inherits Discovery's Forms/Docs scopes. Re-running setup in Live mode does not generate AI output or create Asana tasks; operators invoke those actions explicitly.
+
 Primary references: [bound-script copy behavior](https://developers.google.com/apps-script/guides/bound), [authorization](https://developers.google.com/apps-script/guides/services/authorization), [FormApp creation and publish state](https://developers.google.com/apps-script/reference/forms/form-app), [document properties](https://developers.google.com/apps-script/reference/properties/properties-service), and [clasp](https://developers.google.com/apps-script/guides/clasp).

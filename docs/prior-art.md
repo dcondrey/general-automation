@@ -27,3 +27,9 @@ Run `npm run check` for the evidence above. A passing test suite proves these sp
 ## Gate for the next module
 
 Before adding a module, identify the closest maintained alternative, inspect its license and actual relevant implementation, and document a concrete unmet operator need. Reuse a suitable maintained component rather than rewriting a mature integration. An addition must demonstrate a useful improvement, a small reproducible scenario, failure recovery, and live validation. Keep comparative claims scoped to observed evidence.
+
+## Expanded suites
+
+Marketplace metrics, structured LLM classification, and Asana task creation are also established techniques. These suites are not claimed as first implementations. Their contribution is the operating contract: dated inbound cannot hide an earlier stockout; stale feeds do not falsely clear business exceptions; uncertain digest delivery stays held; paid LLM requests are checkpointed before generation; and uncertain Asana writes are reconciled against an exact destination marker. Regression tests exercise these failure cases. The generated examples are reproducible from the same production functions.
+
+The integrations use documented native APIs rather than copied unofficial wrappers: [Asana task creation](https://developers.asana.com/reference/createtask), [Asana pagination](https://developers.asana.com/docs/pagination), [Slack incoming webhooks](https://api.slack.com/messaging/webhooks), and [Gemini structured output](https://ai.google.dev/gemini-api/docs/structured-output). Live-account performance, provider accuracy, and production adoption have not been demonstrated by the local tests.

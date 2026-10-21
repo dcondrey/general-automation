@@ -1,9 +1,11 @@
 node_modules/
 .clasp.json
+.clasp.*.json
 .DS_Store
 *.log
 .clasprc.json
 .google-setup.json
+.google-setup.*.json
 .drafts/
 coverage/
 *.tsbuildinfo

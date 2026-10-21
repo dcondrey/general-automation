@@ -1,0 +1,5 @@
+"Key","Type","SKU","Severity","Owner","Detail"
+"DEMO-PET:MAP:unlisted shop","Below MAP","DEMO-PET","Review","Supply chain","Unlisted Shop offers 19 USD against MAP 25. Verify the offer before taking action."
+"DEMO-PET:SELLER:unlisted shop","Seller review","DEMO-PET","Review","Supply chain","Unlisted Shop is absent from your authorized-seller list."
+"DEMO-PET:STOCK","Stock","DEMO-PET","Critical","Supply chain","1.0 days of cover. Only inbound due before initial stockout is counted."
+"DEMO-PET:ADS","Advertising","DEMO-PET","Review","Supply chain","ACOS is 50.0%, above target and materially worse than the supplied comparison."

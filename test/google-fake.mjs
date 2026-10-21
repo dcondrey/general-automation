@@ -1,5 +1,5 @@
 export function googleFake() {
-  const env = { docs: new Map(), forms: new Map(), props: new Map(), alerts: [], released: 0, held: false };
+  const env = { docs: new Map(), forms: new Map(), props: new Map(), userProps: new Map(), alerts: [], released: 0, held: false };
   const column = text => [...text].reduce((n, c) => n * 26 + c.charCodeAt(0) - 64, 0);
   class Range {
     constructor(sheet, row, col, height = 1, width = 1) { Object.assign(this, { sheet, row, col, height, width }); }
@@ -77,7 +77,7 @@ export function googleFake() {
   const services = {
     SpreadsheetApp: { getActiveSpreadsheet: () => ss, getUi: () => ui, newDataValidation: validation, ProtectionType: { SHEET: 'sheet' } },
     Charts: { ChartType: { BAR: 'bar' } },
-    PropertiesService: { getDocumentProperties: () => ({ getProperty: key => env.props.get(key) ?? null, setProperty: (key, val) => env.props.set(key, val) }) },
+    PropertiesService: { getDocumentProperties: () => ({ getProperty: key => env.props.get(key) ?? null, setProperty: (key, val) => env.props.set(key, val) }), getUserProperties: () => ({ getProperty: key => env.userProps.get(key) ?? null, setProperty: (key, val) => env.userProps.set(key, val) }) },
     LockService: { getDocumentLock: () => ({ tryLock() { if (env.held) return false; env.held = true; return true; }, releaseLock() { env.held = false; env.released++; } }) },
     FormApp: { ItemType: { TEXT: 'TEXT', MULTIPLE_CHOICE: 'MULTIPLE_CHOICE' }, createTextValidation: validation,
       create(_title, published) { const f = new Form('form' + (env.forms.size + 1), published); env.forms.set(f.id, f); return f; },

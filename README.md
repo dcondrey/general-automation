@@ -30,12 +30,13 @@
 
 A library of practical Google Workspace tools for people who run operations. Start with the work itself: find out who needs it, remove duplicated steps, and measure whether the remaining automation pays for its upkeep.
 
-The first template is the **Automation Discovery Kit**. It turns a department's list of manual work into a ranked backlog, an impact dashboard, and a short discovery brief. Supply chain, catalog, reporting, client services, and finance examples use fictional data; the kit works across industries.
+Four independent templates cover discovery, marketplace exceptions, feedback triage, and team handoffs. Each has a synthetic demo, a menu for operators, its own permission bundle, and regression tests around consequential failures. Supply chain, catalog, reporting, client services, and finance examples are fictional; the library stays generic.
 
 ## Start here
 
 | You want to… | Open |
 | --- | --- |
+| Inspect real example outputs immediately | [Five generated demo outputs](examples/README.md) — no account or installation |
 | Try the workbook without writing code | [Installation and operator guide](docs/operators/discovery.md) |
 | Understand a recommendation | [Scoring and design decisions](docs/design.md) |
 | Use the formulas in your own Sheet | [Formula cookbook](sheets/formulas.md) |
@@ -43,9 +44,28 @@ The first template is the **Automation Discovery Kit**. It turns a department's 
 | Install or extend the source | [Developer guide](dev/README.md) |
 
 > [!NOTE]
-> This is a v0.1 preview. The source and automated checks are available; the validation record tracks live Google testing and template availability. A copy link is published only after the workbook is initialized and verified. No placeholder demo links.
+> These are implemented previews. The [validation record](docs/validation.md) separates local tests, uploaded Google bundles, and unverified live-service behavior. Public copy links follow real Google acceptance checks; API credentials and consent are never supplied by this repository.
 
-Once a template is installed, operators use the **Automations** menu and yellow input cells. They do not edit scripts, install packages, or manage API keys. Google account consent and your organization's access policies still apply.
+Once a template is installed, operators use the **Automations** menu and yellow Settings cells. Optional service credentials go through the **Connections** sidebar. Routine work requires no script editing or package installation. Google account consent and your organization's access policies still apply.
+
+## The library
+
+| Template | What it does | Operator guide | Inspect the output |
+| --- | --- | --- | --- |
+| **Discovery Kit** | Prices manual work, deducts upkeep, withholds overlapping estimates, ranks deletion/redesign/automation, and produces a brief. | [Discovery](docs/operators/discovery.md) | [Ranked backlog](examples/discovery-ranked.csv) |
+| **Marketplace Watch** | Reviews MAP offers and sellers, forecasts inventory with dated inbound, calculates advertising metrics, and manages a persistent signal queue with snoozes and new-only Slack digests. | [Marketplace](docs/operators/marketplace.md) | [Signals](examples/marketplace-signals.csv) · [Metrics](examples/marketplace-metrics.csv) |
+| **AI Sorter** | Classifies feedback with Gemini, previews token costs, holds uncertain requests, flags human review, and compares labeled-set accuracy against a deterministic baseline. | [AI Sorter](docs/operators/sorter.md) | [Baseline fixture](examples/sorter-baseline.csv) |
+| **Team Handoffs** | Validates the next team's inputs, checks Asana source-task completion, creates the destination task, and reconciles unconfirmed writes without blindly creating duplicates. | [Handoffs](docs/operators/handoffs.md) | [Exact task payload](examples/handoff-preview.json) |
+
+All four can be built locally with `npm run build`. An installer runs `npm run setup -- discovery`, `marketplace`, `sorter`, or `handoffs` once; each gets a separate workbook and bound script. The [developer guide](dev/README.md) covers authorization. Routine operation happens in Sheets.
+
+### Decisions that survive real operational edge cases
+
+- **A purchase order is not available stock.** Marketplace Watch includes inbound only when it arrives before the initial stockout; overdue shipments and stale snapshots remain exceptions.
+- **Missing data is not a recovery.** Data-quality gaps preserve earlier business alerts. A new healthy snapshot can resolve them; a snooze or acknowledgement survives repeated checks.
+- **An API timeout is not proof nothing happened.** Handoffs records intent before creating a task. An unconfirmed write stays held while reconciliation searches the destination for its exact marker.
+- **An AI answer is not an action.** Sorter outputs suggestions and review flags. It cannot invoke business tools or create tasks. A paid request interrupted after sending is never automatically repeated.
+- **Accuracy needs a baseline and matching examples.** The evaluator excludes missing or stale predictions and compares the classifier and keyword baseline on the same labeled subset.
 
 ## Automation Discovery Kit
 
@@ -116,21 +136,21 @@ The calculations, Forms intake, menus, and document generation are established t
 
 ## Permissions and limits
 
-The Discovery bundle requests access to the **current spreadsheet**, **Google Forms**, and **Google Docs**. Forms and Docs permissions are broader because the kit creates and reopens those files. Preview mode prevents file creation; it does not change Google's consent screen. There is no external HTTP access, Gmail access, public webhook, scheduled trigger, or LLM service in this release.
+The Discovery bundle requests access to the **current spreadsheet**, **Google Forms**, and **Google Docs**. Forms and Docs permissions are broader because the kit creates and reopens those files. Preview mode prevents file creation; it does not change Google's consent screen. Discovery includes no external HTTP access or LLM service. The other three bundles request the **current spreadsheet**, **external requests**, and **sidebar UI**. No bundle requests Gmail access or installs a public webhook or scheduled trigger.
 
-Data stays in your Google account. Workbook editors can inspect and run the bound script. Forms and report Docs follow their own Google sharing permissions. One person should own intake imports and report refreshes unless the related files have been shared with the other operators.
+Discovery data stays in your Google account. In Live mode, Marketplace Watch sends selected signal details to your Slack webhook, AI Sorter sends the selected feedback and labels to Gemini, and Team Handoffs sends the validated task inputs to Asana. Those services' account terms and access rules apply. Credentials are private to the Google login and workbook that saved them. Workbook editors can inspect and run the bound script. Forms and report Docs follow their own Google sharing permissions. One person should own intake imports and report refreshes unless the related files have been shared with the other operators.
 
 Each input tab supports up to **2,000 rows**; a Form supports **2,000 submissions per intake period** in this kit. Start a fresh workbook for a new period. Imports run when you choose **Rank my backlog**, not on a schedule. Keep imported rows and their Source IDs together: deleting an imported row makes that submission eligible for import again.
 
 ## Library roadmap
 
-Only the Discovery Kit is implemented. Later suites must pass a prior-art review and ship with their own operator guide, synthetic demo, recovery tests, and Google validation record.
+The four suites above are implemented. External-service acceptance still requires the operator's accounts and representative feeds. Further additions need a prior-art review, a demonstrable operator improvement, recovery tests, and a Google validation record.
 
-| Suite | Planned scope | Release gate |
+| Extension | Candidate scope | Release gate |
 | --- | --- | --- |
-| Marketplace Watch | Offers and authorized-seller checks, inventory cover, actionable signal queue, deduplicated digest | Use an approved feed; distinguish bad data from a real event; prove alert and snooze behavior. |
-| AI Sorter | Feedback labels, review queue, cost preview, prompt versions, evaluation set | Compare against a simple non-LLM baseline; measure accuracy, review load, and cost. |
-| Team Handoffs | Validated cross-team inputs, Asana handoffs, Make scenario, exception recovery | Demonstrate replay without duplicate tasks; verify an actual scenario import and run. |
+| Feed adapters | Approved marketplace exports and recurring reports | Preserve provenance and make partial/duplicate imports recoverable. |
+| AI extractors | Transcript actions and document fields | A representative labeled set, measured review load, schema checks, and operator approval. |
+| Platform scenarios | Make/Zapier handoffs and notifications | Import and execute an actual scenario with owned credentials before claiming it works. |
 
 The [full candidate map](docs/roadmap.md) accounts for the original 20 ideas. A generic rules engine, broad OAuth bundle, and speculative production integrations are outside v0.1.
 
@@ -145,11 +165,12 @@ npm ci
 npm run check
 ```
 
-`npm run check` checks Apps Script service types and source syntax, runs the regression suite, and builds the deterministic template bundle. CI repeats this and rejects stale generated files. The tests cover scoring boundaries, overlapping baselines, formula injection, resource identity after copying, failed writes, interrupted setup, import deduplication, and operator input preservation. Local service fakes do not verify Google's UI or OAuth behavior.
+`npm run check` checks Apps Script service types and source syntax, builds all four bundles, runs the regression suite, and verifies the generated examples. CI rejects stale output. Tests cover scoring boundaries, overlapping baselines, dated inbound, stale feeds, signal lifecycle, digest uncertainty, model schemas and token controls, Asana completion gates and reconciliation, formula injection, workbook identity, interrupted setup, and operator input preservation. Local service fakes do not verify Google's UI, OAuth, or external account access.
 
 ```text
 src/                  Apps Script implementation and custom function
-dist/discovery/       Generated Code.gs and explicit OAuth manifest
+dist/                 Four independent bundles and their OAuth manifests
+examples/             Generated CSV/JSON outputs you can inspect on GitHub
 sheets/               Advanced formula examples
 docs/operators/       Instructions for the person using the workbook
 docs/                 Design, prior art, validation, and roadmap

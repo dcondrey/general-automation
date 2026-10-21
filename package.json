@@ -9,7 +9,8 @@
   "scripts": {
     "build": "node dev/build.mjs",
     "test": "node --test test/*.test.mjs",
-    "check": "tsc -p jsconfig.json && node dev/check.mjs && npm test && npm run build && node dev/build.mjs --check",
+    "demo": "node dev/demo.mjs",
+    "check": "tsc -p jsconfig.json && node dev/check.mjs && npm run build && npm test && node dev/build.mjs --check && node dev/demo.mjs --check",
     "setup": "node dev/setup.mjs",
     "clasp": "clasp"
   },

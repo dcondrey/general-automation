@@ -1,24 +1,24 @@
 # Candidate map
 
-v0.1 implements Discovery only. The other entries are candidates, not supported modules or implied production integrations. [Prior-art review](prior-art.md) is required before extending the library.
+Four preview suites are implemented: Discovery, Marketplace Watch, AI Sorter, and Team Handoffs. Live external-service acceptance is separate from source implementation. The remaining entries are candidates, not implied production integrations. [Prior-art review](prior-art.md) is required before extending the library.
 
 | Original idea | Disposition | Useful extension or acceptance requirement |
 | --- | --- | --- |
 | 1. Automation backlog ranker | Implemented in Discovery | Net benefit after upkeep, cross-team overlap reconciliation, delete/redesign/keep-manual/investigate decisions. |
-| 2. Run log and alerts | Local Run log implemented | Add external alerts only in the relevant suite; prove deduplication and secret-free diagnostics. |
+| 2. Run log and alerts | Run log in all suites; Slack digest in Marketplace Watch | Unknown deliveries stay held instead of blindly repeating. |
 | 3. Runbook/SOP generator | Operator guide shipped; generator deferred | A useful runbook needs actual ownership and recovery evidence, not a template claiming completeness. |
 | 4. Trigger manager and menu | Menu implemented; triggers deferred | Discovery works on demand. Add scheduling only where it saves work and document trigger ownership after copies. |
-| 5. Asana handoff | Team Handoffs candidate | Validate the next team's required inputs; replay without duplicate tasks. |
+| 5. Asana handoff | Implemented preview | Validated receiving-team inputs, completion gate, intent ledger, and paginated reconciliation. |
 | 6. Brand onboarding kit | Handoff configuration candidate | A checklist and owned intake may be sufficient. Reuse a verified handoff before provisioning more resources. |
 | 7. Zapier/Make webhook | Handoff boundary candidate | Prefer the platform's authenticated webhook and established signing mechanisms; no anonymous endpoint in Discovery. |
 | 8. HubSpot sync | Deferred | Search for maintained connectors first; implement only a measured unmet reconciliation need. |
-| 9. MAP monitor | Marketplace Watch candidate | Accept authorized data feeds, reconcile authorized sellers, preserve evidence, review alerts with a person. |
-| 10. Inventory cover | Marketplace Watch candidate | Model dated inbound stock and missing demand instead of adding all future inbound to present availability. |
-| 11. Ads metrics | Marketplace Watch candidate | Make denominators, attribution windows, and missing data explicit; benchmark against existing reporting. |
+| 9. MAP monitor | Implemented in Marketplace Watch | Approved input feeds, currency guards, authorized-seller comparison, and review queue. |
+| 10. Inventory cover | Implemented in Marketplace Watch | Dated inbound, overdue exceptions, undefined zero-demand cover, and reorder point. |
+| 11. Ads metrics | Implemented in Marketplace Watch | ACOS, TACOS, ROAS, guarded denominators, and a supplied comparison window. |
 | 12. Catalog guardrails | Marketplace data-quality candidate | Batch validation before alerts; distinguish malformed identifiers and stale feeds from genuine business exceptions. |
 | 13. Listing change audit | Deferred | Require a permitted feed and stable snapshots; avoid unverified scraping. |
 | 14. Report ingestion | Deferred | Identify a report format and provenance contract; make duplicate attachments and partial imports recoverable. |
-| 15. LLM categorizer | AI Sorter candidate | Evaluate against a deterministic baseline; validate schema, contain untrusted input, track cost, and route uncertain rows to review. |
+| 15. LLM categorizer | Implemented AI Sorter preview | Strict output schema, token preflight, held paid requests, prompt version, human review, and matched-set evaluation against a baseline. |
 | 16. Transcript actions | Deferred | Require owner/date confirmation before creating tasks; reuse the handoff contract. |
 | 17. Claims screener | Deferred | Needs a labeled evaluation set and qualified review; a risk label is not a legal determination. |
 | 18. Document parser | Deferred | Verify exact source fields and uncertainty; do not silently convert an extraction guess into a trusted record. |

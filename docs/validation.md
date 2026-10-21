@@ -4,9 +4,9 @@ This file separates local verification from live Google execution. Update it wit
 
 ## Current state
 
-- Source: Discovery v0.1 preview with a deterministic Apps Script bundle.
-- Local: `npm run check` passed on 2026-10-21: Apps Script type checks, source syntax and scope checks, 30 regression tests, and reproducible bundle checks.
-- Google: developer OAuth authorized, a bound spreadsheet project created, and the two-file bundle successfully pushed on 2026-10-21. A complete end-to-end Google run has not yet been recorded.
+- Source: four independent preview suites, each with an explicit OAuth manifest and deterministic bundle.
+- Local: `npm run check` passed on 2026-10-21 with 57 tests, Apps Script service type checks, generated-bundle entry-point/scope checks, reproducible bundles, and generated examples verified across three time zones.
+- Google: all four bound workbook projects were created and their complete bundles uploaded successfully on 2026-10-21. A complete end-to-end Google run has not yet been recorded.
 - Template: no verified public copy link yet.
 - Assets: transparent PNG logo and supplied 1280×640 social banner are stored in `assets/`.
 
@@ -29,4 +29,14 @@ Use an owned test workbook with synthetic inputs. Record the workbook, bundle re
 
 ## Evidence
 
-The local final gate passed with Node 26.8.1; CI targets Node 24 from `.nvmrc`. Google accepted the bound project and bundle upload. No complete live acceptance run recorded yet. Local service fakes exercise orchestration and failures but do not calculate formulas, show dialogs, authorize scopes, publish Forms, or prove Google's copy behavior.
+Local checks run on Node 26.8.1; CI targets Node 24 from `.nvmrc`. The initial Discovery commit passed hosted CI. All four Google uploads were confirmed: Discovery (2 files), Marketplace Watch (3), AI Sorter (3), and Team Handoffs (3). Source upload is not a runtime acceptance test. Local service fakes exercise orchestration and failures but do not calculate formulas, show dialogs, authorize scopes, publish Forms, or prove Google's copy behavior. Public template publication awaits runtime consent and the acceptance checks above.
+
+## Additional suite acceptance
+
+| Suite | Local evidence | Required account-level acceptance |
+| --- | --- | --- |
+| Marketplace Watch | Demo isolation; late vs timely inbound; missing/stale data; currency and denominator guards; triage/reopen lifecycle; uncertain digest delivery; 20-item batching | Run setup and demo in Google, import a representative approved feed, exercise snoozes, and confirm one real Slack digest plus a no-repeat run. |
+| AI Sorter | Strict schema; deterministic baseline; held paid request after ambiguous failure; token/rate estimate gate; usage recording; cache behavior; same-subset labeled evaluation; text-size boundary | Run setup/demo in Google, authorize a real provider key, confirm one paid classification and usage record, test representative review cases, and verify provider pricing for the account. |
+| Team Handoffs | Validated payload; rounded-ID rejection; source-completion gate; replay protection; uncertain-write reconciliation; changed-input hold | Run setup/demo in Google; create a task in an owned Asana test project, verify the marker and inputs, repeat without creating another task, and reconcile a deliberately interrupted acknowledgement. |
+
+The keyword demo is not an LLM benchmark. The Asana tests are protocol simulations, not a claim of production workflow usage. The Make/Zapier contract has not been imported or executed as a platform scenario. No paid provider requests or real Slack/Asana messages are sent by local checks.
