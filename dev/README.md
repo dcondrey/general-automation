@@ -31,7 +31,7 @@ The pinned clasp development dependency currently inherits [GHSA-vfj7-8cjw-p6xm]
    npm run clasp -- open-container
    ```
 
-4. Reload the workbook. Choose **Automations → Set up workbook** and approve Google's runtime consent. Google service permissions are separate from the developer CLI login.
+4. Reload the workbook. In Discovery, choose **Automations → View and setup → Set up workbook**; in the other suites, choose **Automations → Set up workbook**. Approve Google's runtime consent. Google service permissions are separate from the developer CLI login.
 5. Follow [the live acceptance checklist](../docs/validation.md). Publish a template copy link only after these checks pass.
 
 Use `marketplace`, `sorter`, or `handoffs` instead of `discovery` for the other templates. Each has a separate `dist/<suite>/` bundle and `.clasp.<suite>.json` binding; Discovery keeps `.clasp.json` for compatibility. Setup prints the correct command to open that suite's container.

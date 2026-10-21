@@ -49,4 +49,5 @@ if (!existsSync(configPath)) {
 const rebuild = spawnSync(process.execPath, [join(root, 'dev/build.mjs')], { cwd: root, stdio: 'inherit' });
 if (rebuild.status !== 0) process.exit(1);
 run(['push', '--force']);
-console.log('Open the workbook with npm run clasp -- --project ' + configName + ' open-container. Reload it, then choose Automations → Set up workbook.');
+const setupMenu = suite === 'discovery' ? 'Automations → View and setup → Set up workbook' : 'Automations → Set up workbook';
+console.log('Open the workbook with npm run clasp -- --project ' + configName + ' open-container. Reload it, then choose ' + setupMenu + '.');
