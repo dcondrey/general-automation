@@ -29,7 +29,7 @@ Use an owned test workbook with synthetic inputs. Record the workbook, bundle re
 
 ## Evidence
 
-Local checks run on Node 26.8.1; CI targets Node 24 from `.nvmrc`. The initial Discovery commit passed hosted CI. All four Google uploads were confirmed: Discovery (2 files), Marketplace Watch (3), AI Sorter (3), and Team Handoffs (3). Source upload is not a runtime acceptance test. Local service fakes exercise orchestration and failures but do not calculate formulas, show dialogs, authorize scopes, publish Forms, or prove Google's copy behavior. Public template publication awaits runtime consent and the acceptance checks above.
+Local checks run on Node 26.8.1; CI uses Node 24 from `.nvmrc`. Both the initial Discovery commit and expanded four-suite commit `295c6ae` passed hosted CI; [expanded run](https://github.com/dcondrey/general-automation/actions/runs/39584249547). All four Google uploads were confirmed: Discovery (2 files), Marketplace Watch (3), AI Sorter (3), and Team Handoffs (3). Source upload is not a runtime acceptance test. Local service fakes exercise orchestration and failures but do not calculate formulas, show dialogs, authorize scopes, publish Forms, or prove Google's copy behavior. Public template publication awaits runtime consent and the acceptance checks above. An export of the owned Discovery container still showed only its original Sheet1 before owner setup; the uploaded script has not yet initialized that workbook.
 
 ## Additional suite acceptance
 
