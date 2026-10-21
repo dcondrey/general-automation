@@ -42,4 +42,6 @@ The root `.clasp.json` is ignored, as are credential files. Never commit OAuth t
 
 ## Extend the library
 
+Run `npm run check:browser` with Chrome installed to exercise guided intake, an unconfirmed-save retry, action planning, and a measured result through the real HTML interface and synthetic server adapters. Set `BROWSER_BIN` if Chrome is elsewhere. It opens a temporary isolated profile, binds its test server to loopback, and removes the profile afterward; it uses no Google login or live data. Generate the README screenshot with `node dev/check-workspace.mjs --preview assets/workspace-preview.png`. These checks do not establish Google consent or HTML-service runtime acceptance.
+
 Start with the [prior-art gate](../docs/prior-art.md). Prefer an independent small template over adding scopes to Discovery. Define required inputs, ownership, output, retry semantics, and the action an operator can take when it fails. Add meaningful logic and failure-boundary tests, synthetic data, an operator guide, and a separate live verification record. Do not claim a Make blueprint, external integration, or formula works until its real runtime was exercised.

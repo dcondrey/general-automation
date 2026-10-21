@@ -5,7 +5,7 @@ import { join } from 'node:path';
 export const root = fileURLToPath(new URL('../', import.meta.url));
 const common = ['Book', 'RunLog', 'Operator'];
 export const bundles = {
-  discovery: { sources: common.concat(['Backlog', 'Settings', 'Demo', 'Template', 'DiscoveryHome', 'Intake', 'Report', 'Main']) },
+  discovery: { sources: common.concat(['Backlog', 'Settings', 'Demo', 'Template', 'DiscoveryHome', 'Workspace', 'Intake', 'Report', 'Main']) },
   marketplace: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Watch']), entry: 'Watch' },
   sorter: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Sorter']), entry: 'Sorter' },
   handoffs: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Handoffs']), entry: 'Handoffs' },
@@ -17,6 +17,7 @@ for (const [suite, spec] of Object.entries(bundles)) {
   const manifest = spec.entry ? JSON.stringify({ timeZone: 'America/Los_Angeles', runtimeVersion: 'V8', exceptionLogging: 'STACKDRIVER', oauthScopes: ['https://www.googleapis.com/auth/spreadsheets.currentonly', 'https://www.googleapis.com/auth/script.external_request', 'https://www.googleapis.com/auth/script.container.ui'] }, null, 2) + '\n' : await readFile(join(root, 'appsscript.json'), 'utf8');
   const outputs = { 'Code.gs': code, 'appsscript.json': manifest };
   if (spec.entry) outputs['Connections.html'] = await readFile(join(root, 'src/Connections.html'), 'utf8');
+  else outputs['Workspace.html'] = await readFile(join(root, 'src/Workspace.html'), 'utf8');
   await mkdir(join(root, 'dist', suite), { recursive: true });
   for (const [name, content] of Object.entries(outputs)) {
   const target = join(root, 'dist', suite, name);

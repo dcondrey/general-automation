@@ -11,6 +11,7 @@
     "test": "node --test test/*.test.mjs",
     "demo": "node dev/demo.mjs",
     "check": "tsc -p jsconfig.json && node dev/check.mjs && npm run build && npm test && node dev/build.mjs --check && node dev/demo.mjs --check",
+    "check:browser": "node dev/check-workspace.mjs",
     "setup": "node dev/setup.mjs",
     "clasp": "clasp"
   },

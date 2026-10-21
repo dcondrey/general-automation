@@ -5,10 +5,10 @@ This file separates local verification from live Google execution. Update it wit
 ## Current state
 
 - Source: four independent preview suites, each with an explicit OAuth manifest and deterministic bundle.
-- Local: `npm run check` passed on 2026-10-21 with 61 tests, Apps Script service type checks, generated-bundle entry-point/scope checks, reproducible bundles, and generated examples verified across three time zones.
-- Google: all four bound workbook projects were created and uploaded on 2026-10-21. Discovery setup, the simplified layout migration, native data-source actions, and detailed-view actions have run successfully in Google. Forms, Docs, and copy-isolation acceptance remain pending.
+- Local: `npm run check` passed on 2026-10-21 with 75 tests, Apps Script service type checks, HTML script syntax checks, generated-bundle entry-point/scope checks, reproducible bundles, and generated examples verified across three time zones. The Chrome workflow check also passed.
+- Google: all four bound workbook projects were created and uploaded on 2026-10-21. Discovery setup, the simplified layout migration, native data-source actions, detailed-view actions, and the guided workspace's authorized loading have run successfully in Google. Native workspace writes, Forms, Docs, and copy-isolation acceptance remain pending.
 - Template: no verified public copy link yet.
-- Assets: transparent PNG logo, supplied 1280×640 social banner, and an actual Google-rendered Discovery start-page capture are stored in `assets/`.
+- Assets: transparent PNG logo, supplied 1280×640 social banner, an actual Google-rendered Discovery start-page capture, and the guided workspace rendered in Chrome with synthetic adapters are stored in `assets/`.
 
 ## Required Google acceptance
 
@@ -40,6 +40,22 @@ The owner ran Discovery setup on 2026-10-21. The owned workbook's native interfa
 - The native Dashboard's cached formulas report baseline `24.58333333`, portfolio potential `17.84583333`, measured savings `3.5`, and six valid processes. QUERY returns the six expected rows. No exported cell has a formula-error type. Portfolio potential includes the live example; the opening page correctly excludes it from remaining potential.
 
 Live visual inspection covered the start page and seven-column input view. The remaining checklist, including repeat-setup preservation, editing representative real rows, Form submission import, generated Docs, chart appearance, and copied-resource isolation, still needs account-level acceptance before publishing a public template. Local service fakes exercise orchestration and failures but do not calculate formulas, show dialogs, authorize scopes, publish Forms, or prove Google's copy behavior.
+
+## Guided workspace extension
+
+The Discovery bundle now includes `Workspace.html`, a guarded RPC dispatcher, persistent action plans, and recoverable measurement history. It adds `script.container.ui` to display the dialog. The existing owned workbook received the three-file bundle. The owner approved Google's new permission on 2026-10-21. Native window inspection confirmed the dialog loaded inside Google Sheets and displayed the server-returned demo: baseline `24.6`, remaining potential `14.0`, measured `3.5`, explanatory recommendation cards, and the source selector. A subsequent export confirmed four visible tabs, unchanged Backlog/Demo backlog/Settings cell values, and no formula-error cells. This verifies HTML-service loading and the initial RPC read. Workspace mutations have not yet been exercised in Google's runtime.
+
+`npm run check:browser` serves the production HTML over loopback and connects its RPC calls to the same Apps Script implementation through synthetic Google adapters. It drives the interface to:
+
+1. Load the six-row demo and preview the README inventory example, including rework and upkeep, with net potential `5.6333333333` hours/week.
+2. Save a process, receive a deliberately unconfirmed response after the write, and retry the same browser save. Exactly one Backlog row remains.
+3. Render an HTML-like process name as text, with no injected image or executed handler.
+4. Save a next step and target date, then interrupt the measurement's source write after its history intent was saved. Refresh the interface and use **Finish interrupted save** to record four observed hours/week with evidence and live confirmation.
+5. Verify one measurement record, a Live source process, and zero additional potential for that delivered process.
+
+The 14 new backend regressions also cover text and measurement boundaries, identity forgery, sorted rows, stale source and plan edits, orphaned plans, partial identity writes, interrupted measurements, date normalization, explicit resumption, repeated observations, zero savings, damaged history identities and hashes, output-refresh failure, and lock contention. These checks run without Google credentials or external messages. The browser flow is part of GitHub Actions; the [workspace preview](../assets/workspace-preview.png) is reproducible with `node dev/check-workspace.mjs --preview assets/workspace-preview.png`.
+
+Native acceptance still needs: add a synthetic process, save and reload its plan, record a result, and inspect the source row and history in Google. Confirm that no real inputs, Forms, Docs, or sharing settings change. Action plan and Savings history each have a 2,000-row limit shared by demo and own-data entries; start a new workbook for another intake period rather than deleting audit rows.
 
 ## Additional suite acceptance
 

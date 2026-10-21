@@ -1,6 +1,7 @@
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Automations')
+    .addItem('Open guided workspace', 'openAutomationWorkspace')
     .addItem('Start here', 'openDiscoveryHome')
     .addItem('Refresh priorities', 'rankBacklog')
     .addItem('Use my own data', 'useOwnBacklog')

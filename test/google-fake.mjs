@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 export function googleFake() {
   const env = { docs: new Map(), forms: new Map(), props: new Map(), userProps: new Map(), alerts: [], released: 0, held: false };
   const column = text => [...text].reduce((n, c) => n * 26 + c.charCodeAt(0) - 64, 0);
@@ -87,6 +89,7 @@ export function googleFake() {
     for (const name of ['setMarginTop', 'setMarginBottom', 'setMarginLeft', 'setMarginRight', 'setFontFamily', 'setFontSize', 'setSpacingAfter', 'setHeading']) body[name] = () => body;
     return body; };
   const services = {
+    Utilities: { DigestAlgorithm: { SHA_256: 'sha256' }, Charset: { UTF_8: 'utf8' }, computeDigest: (_algorithm, text) => [...createHash('sha256').update(text).digest()] },
     SpreadsheetApp: { getActiveSpreadsheet: () => ss, getUi: () => ui, newDataValidation: validation, newRichTextValue: () => ({ text: '', setText(t) { this.text = t; return this; }, setLinkUrl() { return this; }, build() { return this; } }), ProtectionType: { SHEET: 'sheet' } },
     Charts: { ChartType: { BAR: 'bar' } },
     PropertiesService: { getDocumentProperties: () => ({ getProperty: key => env.props.get(key) ?? null, setProperty: (key, val) => env.props.set(key, val) }), getUserProperties: () => ({ getProperty: key => env.userProps.get(key) ?? null, setProperty: (key, val) => env.userProps.set(key, val) }) },

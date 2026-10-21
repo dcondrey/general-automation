@@ -69,9 +69,19 @@ All four can be built locally with `npm run build`. An installer runs `npm run s
 
 ## Automation Discovery Kit
 
-<p align="center"><img src="assets/discovery-preview.png" width="840" alt="The actual Google Sheets start page: a clearly labeled demo, four summary cards, and three recommendations with owners and estimated hours."></p>
+<p align="center"><img src="assets/workspace-preview.png" width="960" alt="The guided workspace: overview, process intake, action plan, and measurement navigation; recommendations explain the action, effort, and payback."></p>
 
-*Captured from the live Google Sheets workbook using fictional demo data.*
+*Production workspace interface rendered in Chrome with synthetic examples. The [validation record](docs/validation.md) distinguishes browser checks from Google authorization and live service checks.*
+
+### Guided workspace
+
+Choose **Automations → Open guided workspace**. Routine discovery can happen here without editing a cell:
+
+1. **Add a process.** Answer seven plain-language questions, optionally refine the people, rework, upkeep, and overlap assumptions, then preview the recommendation before saving.
+2. **Plan the next step.** Give a process a specific next action and optional due date. Its owner and plan stay attached when source rows move; conflicting edits ask you to refresh.
+3. **Measure the result.** Record observed weekly savings, the measurement date, and supporting evidence. The process becomes Live, while earlier observations remain in history and never inflate the current total.
+
+The overview also shows remaining opportunity by department. Switch between fictional examples and your own work inside the workspace. An unconfirmed save can be retried without duplicating a process or measurement; interrupted measurements have a **Finish interrupted save** action, with changed source data held for review.
 
 ```mermaid
 flowchart LR
@@ -84,6 +94,7 @@ flowchart LR
 
 | Operator action | Result |
 | --- | --- |
+| **Open guided workspace** | Guides intake, explains recommendations, saves next steps and dates, and records measured results with evidence. |
 | **Start here** | Shows the next three opportunities, baseline effort, remaining potential, measured savings, and rows to fix. |
 | **Use my own data** | Opens Backlog with seven essential fields. The demo remains separate. |
 | **Refresh priorities** | Checks inputs, imports Form submissions when enabled, and refreshes the recommendations and brief. |
@@ -143,7 +154,7 @@ The calculations, Forms intake, menus, and document generation are established t
 
 ## Permissions and limits
 
-The Discovery bundle requests access to the **current spreadsheet**, **Google Forms**, and **Google Docs**. Forms and Docs permissions are broader because the kit creates and reopens those files. Preview mode prevents file creation; it does not change Google's consent screen. Discovery includes no external HTTP access or LLM service. The other three bundles request the **current spreadsheet**, **external requests**, and **sidebar UI**. No bundle requests Gmail access or installs a public webhook or scheduled trigger.
+The Discovery bundle requests access to the **current spreadsheet**, **Google Forms**, **Google Docs**, and **in-workbook dialogs**. Forms and Docs permissions are broader because the kit creates and reopens those files. Existing installations need Google's additional consent to display the guided workspace. Preview mode prevents file creation; it does not change Google's consent screen. Discovery includes no external HTTP access or LLM service. The other three bundles request the **current spreadsheet**, **external requests**, and **sidebar UI**. No bundle requests Gmail access or installs a public webhook or scheduled trigger.
 
 Discovery data stays in your Google account. In Live mode, Marketplace Watch sends selected signal details to your Slack webhook, AI Sorter sends the selected feedback and labels to Gemini, and Team Handoffs sends the validated task inputs to Asana. Those services' account terms and access rules apply. Credentials are private to the Google login and workbook that saved them. Workbook editors can inspect and run the bound script. Forms and report Docs follow their own Google sharing permissions. One person should own intake imports and report refreshes unless the related files have been shared with the other operators.
 
@@ -173,6 +184,8 @@ npm run check
 ```
 
 `npm run check` checks Apps Script service types and source syntax, builds all four bundles, runs the regression suite, and verifies the generated examples. CI rejects stale output. Tests cover scoring boundaries, overlapping baselines, dated inbound, stale feeds, signal lifecycle, digest uncertainty, model schemas and token controls, Asana completion gates and reconciliation, formula injection, workbook identity, interrupted setup, and operator input preservation. Local service fakes do not verify Google's UI, OAuth, or external account access.
+
+`npm run check:browser` drives the production workspace interface in headless Chrome against synthetic service adapters. It tests the full intake → plan → measurement flow, an unconfirmed-save retry, and safe rendering of HTML-like user text. This is separate from Google runtime acceptance.
 
 ```text
 src/                  Apps Script implementation and custom function

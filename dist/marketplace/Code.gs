@@ -6,6 +6,10 @@ const Book = {
   MAX_ROWS: 2000,
   MAX_TEXT: 2000,
 
+  hash(text) {
+    return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, text, Utilities.Charset.UTF_8).map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');
+  },
+
   open() {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     if (!ss) throw new OperatorError('Open the Discovery workbook and use its Automations menu.');
@@ -175,7 +179,7 @@ const Suite = {
     throw new OperatorError(name + ' must be a date in YYYY-MM-DD format.');
   },
   hash(text) {
-    return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, text, Utilities.Charset.UTF_8).map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');
+    return Book.hash(text);
   },
   help(title, rows) {
     Suite.table('Start here', ['Step', 'What to do']);

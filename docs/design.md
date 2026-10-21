@@ -18,6 +18,12 @@ Four tabs are visible by default: Start here, Priorities, Backlog, and Settings.
 
 The data-source actions change one setting and regenerate output; neither action deletes input rows or enables file creation. The layout migration runs once per workbook revision when opened. It rebuilds owned output and changes visibility without changing source values, settings, or saved Form and Doc identities. Its version is recorded only after the layout is complete, so an interrupted migration can be retried.
 
+The guided workspace runs inside a bound HTML dialog, with no public endpoint. Its RPC dispatcher permits only explicit actions and uses the active workbook. The server validates every process field, request identifier, source reference, date, and measurement. User text is rendered with DOM text methods, and sheet writes use the formula-safe adapter. Browser buttons are disabled during requests; writes remain protected by the document lock and server-side checks.
+
+Guided intake uses a client-generated cryptographic UUID as its submission identity. An unconfirmed request can be repeated without appending another process. Planning adds a stable identity to an anonymous manual row only when needed. Lookups use that identity after sorting; row revisions reject stale source edits, and separate plan revisions reject overwritten annotations. Plans whose sources disappear or become invalid remain visible as unresolved references rather than being discarded.
+
+Measurement history records intent before updating the current source observation. It checkpoints the original request, a source identity, and both before/after content hashes. A retry or explicit resume may finish an unchanged source or acknowledge an already-applied update. Any other source revision remains held. The completion mark is written last; a completed request can never overwrite a later observation. Spreadsheet Date values are normalized before hashing. Current savings come from Backlog, while history is an audit trail, not an additive savings ledger.
+
 ## Overlap and missing evidence
 
 An explicit normalized Overlap group appearing more than once blocks every otherwise-valid row in that group. The tool does not silently choose a winner or sum the rows. Operators must merge shared work into a defensible baseline or establish that the rows measure independent effort. Unmarked overlap cannot be detected reliably from short descriptions. Estimates and measurement evidence still require owner review.
@@ -38,7 +44,7 @@ Invalid rows are isolated in Issues with source row numbers and excluded from ou
 
 ## Scope and distribution
 
-Each suite will be a separately bundled template. The Discovery bundle has current-spreadsheet access plus Forms and Docs scopes, because it creates and reopens those resources. It deliberately has no HTTP, trigger, Drive service, Gmail, Slack, Asana, or LLM code. The source manifest is the permission contract. Forms and Docs permissions apply to those services broadly; a settings toggle cannot narrow the consent grant.
+Each suite is a separately bundled template. The Discovery bundle has current-spreadsheet access, an in-workbook dialog scope, and Forms and Docs scopes, because it creates and reopens those resources. It deliberately has no HTTP, trigger, Drive service, Gmail, Slack, Asana, or LLM code. The source manifest is the permission contract. Forms and Docs permissions apply to those services broadly; a settings toggle cannot narrow the consent grant.
 
 The build explicitly lists the release files, concatenates them without third-party runtime code, and copies the explicit manifest. Generated output is checked into Git for inspection and reproducibility. A developer installs a bound script once; operators copy and use the workbook through its menu. A publicly copyable template must contain only synthetic data and must pass the live validation checklist first.
 

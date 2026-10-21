@@ -1,7 +1,7 @@
 const DiscoveryHome = {
-  VERSION: 'home-v3',
+  VERSION: 'home-v4',
   PRIORITIES: ['Rank', 'Opportunity', 'Next step', 'Potential hours/week', 'Effort hours', 'Owner'],
-  DETAILS: ['Demo backlog', 'Ranked', 'Dashboard', 'Report preview', 'Run log'],
+  DETAILS: ['Demo backlog', 'Ranked', 'Dashboard', 'Report preview', 'Run log', 'Action plan', 'Savings history'],
 
   link(sh, range, label, target) {
     const url = Book.open().getUrl().split('#')[0] + '#gid=' + target.getSheetId();
@@ -39,7 +39,7 @@ const DiscoveryHome = {
     sh.getRange('A1:H2').merge().setValue('Find your next three time savers').setFontSize(25).setFontWeight('bold').setFontColor('#ffffff').setBackground('#15213d');
     sh.getRange('A3:H3').merge().setValue(demo ? 'DEMO  ·  ' + summary.count + ' fictional workflows. Your own work is kept separately.' : 'YOUR WORK  ·  Results from your Backlog. Refresh after changing inputs.')
       .setBackground('#dff3ed').setFontColor('#145047').setFontWeight('bold');
-    sh.getRange('A4:H5').merge().setValue('Start with the examples below. When you are ready, choose Automations → Use my own data. Add a process, then choose Refresh priorities.').setWrap(true).setFontColor('#526079');
+    sh.getRange('A4:H5').merge().setValue('Choose Automations → Open guided workspace to add a process, understand its recommendation, plan the next step, and record an observed result.').setWrap(true).setFontColor('#526079');
 
     const remaining = pending.reduce((total, r) => total + (r.saved || 0), 0);
     const cards = [

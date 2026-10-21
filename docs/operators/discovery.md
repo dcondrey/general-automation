@@ -13,6 +13,21 @@ Template availability and live checks are recorded in [validation](../validation
 
 Setup may be run again. It creates missing tabs and refreshes generated output while retaining your input rows and Settings values. Do not rename the column headings.
 
+## Use the guided workspace
+
+Choose **Automations → Open guided workspace**. Google may ask for permission to display the dialog when upgrading an older installation. Approve that permission through Google's own prompt; it does not connect Slack, Asana, or an AI service.
+
+- **Overview** explains the next three recommendations, their estimated effort and payback, and the remaining opportunity by department.
+- **Add a process** asks about the team, owner, task, frequency, time, purpose, and need for redesign. Optional fields cover people, rework, removable share, effort, upkeep, overlap, and notes. **Preview recommendation** shows the calculation before **Save to my Backlog** adds a row and selects your own data.
+- **Action plan** keeps a next step and optional target date with the source process. Past-due plans are labeled. Refreshing rankings keeps the plan; moving rows keeps their identity. Update the owner in the source Backlog if responsibility changes.
+- **Measure results** asks for observed weekly savings, a date, evidence, and confirmation that the change is live. Zero is a valid result. Each observation remains in Savings history; only the current observation contributes to measured weekly savings.
+
+Use the data-source selector to switch between **Demo examples** and **My work**. Saving through Add a process always writes to your real Backlog; the preview and example filler do not save anything. Plans and measurements made while Demo is selected affect only the fictional demo. No workspace action creates a Form, Doc, notification, or external task.
+
+If a response is interrupted, keep the dialog open and retry the same save. It will not add a duplicate. A measurement interrupted after its history entry was saved appears under Measure results with **Finish interrupted save**. If its source changed meanwhile, the kit holds the measurement for review instead of overwriting the new values. Other editors' changes to a process or action plan require a refresh before saving.
+
+The dialog searches all valid processes, showing up to 100 matching cards at once. Narrow the search to find another process. Invalid or overlapping source rows remain in the workbook's Issues tab. **Show detailed tabs and fields** also reveals Action plan and Savings history; keep their identity and request columns intact.
+
 ## Use your own work
 
 Choose **Automations → Use my own data**. In **Backlog**, fill one row per process using the seven visible columns:
