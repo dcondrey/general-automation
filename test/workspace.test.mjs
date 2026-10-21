@@ -134,6 +134,16 @@ test('observed savings accepts the baseline boundary and rejects values above it
   }
 });
 
+test('source revisions normalize date cells using the workbook calendar across UTC boundaries', () => {
+  const kit = ready(), item = added(kit);
+  kit.env.ss.timeZone = 'Asia/Tokyo';
+  const row = kit.Book.read('Backlog', kit.Backlog.HEADERS)[0]; row[12] = 'Live'; row[13] = 4; row[14] = '2026-01-15';
+  const expected = kit.Workspace.rowHash(row);
+  row[14] = new Date('2026-01-14T15:00:00Z');
+  assert.equal(kit.Workspace.day(row[14]), '2026-01-15');
+  assert.equal(kit.Workspace.rowHash(row), expected);
+});
+
 test('a pending receipt cannot overwrite a changed process or be reused for a different result', () => {
   const kit = ready(), item = added(kit), payload = measurement(item);
   const history = kit.Workspace.history;

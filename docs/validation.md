@@ -5,7 +5,7 @@ This file separates local verification from live Google execution. Update it wit
 ## Current state
 
 - Source: four independent preview suites, each with an explicit OAuth manifest and deterministic bundle.
-- Local: `npm run check` passed on 2026-10-21 with 75 tests, Apps Script service type checks, HTML script syntax checks, generated-bundle entry-point/scope checks, reproducible bundles, and generated examples verified across three time zones. The Chrome workflow check also passed.
+- Local: `npm run check` passed on 2026-10-21 with 76 tests, Apps Script service type checks, HTML script syntax checks, generated-bundle entry-point/scope checks, reproducible bundles, and generated examples verified across three time zones. The Chrome workflow check also passed.
 - Google: all four bound workbook projects were created and uploaded on 2026-10-21. Discovery setup, the simplified layout migration, native data-source actions, detailed-view actions, and the guided workspace's authorized loading have run successfully in Google. Native workspace writes, Forms, Docs, and copy-isolation acceptance remain pending.
 - Template: no verified public copy link yet.
 - Assets: transparent PNG logo, supplied 1280×640 social banner, an actual Google-rendered Discovery start-page capture, and the guided workspace rendered in Chrome with synthetic adapters are stored in `assets/`.
@@ -53,7 +53,7 @@ The Discovery bundle now includes `Workspace.html`, a guarded RPC dispatcher, pe
 4. Save a next step and target date, then interrupt the measurement's source write after its history intent was saved. Refresh the interface and use **Finish interrupted save** to record four observed hours/week with evidence and live confirmation.
 5. Verify one measurement record, a Live source process, and zero additional potential for that delivered process.
 
-The 14 new backend regressions also cover text and measurement boundaries, identity forgery, sorted rows, stale source and plan edits, orphaned plans, partial identity writes, interrupted measurements, date normalization, explicit resumption, repeated observations, zero savings, damaged history identities and hashes, output-refresh failure, and lock contention. These checks run without Google credentials or external messages. The browser flow is part of GitHub Actions; the [workspace preview](../assets/workspace-preview.png) is reproducible with `node dev/check-workspace.mjs --preview assets/workspace-preview.png`.
+The 15 new backend regressions also cover text and measurement boundaries, identity forgery, sorted rows, stale source and plan edits, orphaned plans, partial identity writes, interrupted measurements, workbook-timezone date normalization, explicit resumption, repeated observations, zero savings, damaged history identities and hashes, output-refresh failure, and lock contention. These checks run without Google credentials or external messages. The browser flow is part of GitHub Actions; the [workspace preview](../assets/workspace-preview.png) is reproducible with `node dev/check-workspace.mjs --preview assets/workspace-preview.png`.
 
 Native acceptance still needs: add a synthetic process, save and reload its plan, record a result, and inspect the source row and history in Google. Confirm that no real inputs, Forms, Docs, or sharing settings change. Action plan and Savings history each have a 2,000-row limit shared by demo and own-data entries; start a new workbook for another intake period rather than deleting audit rows.
 

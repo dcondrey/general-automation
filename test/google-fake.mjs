@@ -59,7 +59,7 @@ export function googleFake() {
     insertChart(chart) { this.charts.push(chart); }
   }
   for (const name of ['setFrozenRows', 'setFrozenColumns', 'setHiddenGridlines', 'setTabColor', 'setRowHeight', 'setRowHeights', 'setColumnWidths', 'setColumnWidth']) Sheet.prototype[name] = function () { return this; };
-  const ss = { id: 'original', sheets: new Map(), getId() { return this.id; }, getUrl() { return 'https://docs.google.com/spreadsheets/d/' + this.id + '/edit'; }, getName() { return 'Test Discovery'; }, getSheetByName(name) { return this.sheets.get(name) || null; },
+  const ss = { id: 'original', sheets: new Map(), getId() { return this.id; }, getSpreadsheetTimeZone() { return this.timeZone || 'America/Los_Angeles'; }, getUrl() { return 'https://docs.google.com/spreadsheets/d/' + this.id + '/edit'; }, getName() { return 'Test Discovery'; }, getSheetByName(name) { return this.sheets.get(name) || null; },
     insertSheet(name) { const sh = new Sheet(name); this.sheets.set(name, sh); return sh; }, getActiveSheet() { return this.active || [...this.sheets.values()][0]; },
     setActiveSheet(sh) { this.active = sh; }, moveActiveSheet(position) { const entries = [...this.sheets.entries()].filter(([name]) => name !== this.active.name); entries.splice(position - 1, 0, [this.active.name, this.active]); this.sheets = new Map(entries); }, toast() {} };
   const validation = () => { const b = {}; for (const name of ['requireValueInList', 'setAllowInvalid', 'requireNumberBetween', 'requireTextLengthLessThanOrEqualTo', 'setHelpText']) b[name] = () => b; b.build = () => ({}); return b; };
@@ -89,7 +89,7 @@ export function googleFake() {
     for (const name of ['setMarginTop', 'setMarginBottom', 'setMarginLeft', 'setMarginRight', 'setFontFamily', 'setFontSize', 'setSpacingAfter', 'setHeading']) body[name] = () => body;
     return body; };
   const services = {
-    Utilities: { DigestAlgorithm: { SHA_256: 'sha256' }, Charset: { UTF_8: 'utf8' }, computeDigest: (_algorithm, text) => [...createHash('sha256').update(text).digest()] },
+    Utilities: { DigestAlgorithm: { SHA_256: 'sha256' }, Charset: { UTF_8: 'utf8' }, computeDigest: (_algorithm, text) => [...createHash('sha256').update(text).digest()], formatDate(date, timeZone) { const parts = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date); return ['year', 'month', 'day'].map(type => parts.find(p => p.type === type).value).join('-'); } },
     SpreadsheetApp: { getActiveSpreadsheet: () => ss, getUi: () => ui, newDataValidation: validation, newRichTextValue: () => ({ text: '', setText(t) { this.text = t; return this; }, setLinkUrl() { return this; }, build() { return this; } }), ProtectionType: { SHEET: 'sheet' } },
     Charts: { ChartType: { BAR: 'bar' } },
     PropertiesService: { getDocumentProperties: () => ({ getProperty: key => env.props.get(key) ?? null, setProperty: (key, val) => env.props.set(key, val) }), getUserProperties: () => ({ getProperty: key => env.userProps.get(key) ?? null, setProperty: (key, val) => env.userProps.set(key, val) }) },

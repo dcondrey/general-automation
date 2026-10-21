@@ -25,7 +25,7 @@ const Workspace = {
 
   day(value, optional) {
     if (optional && value === '') return '';
-    if (value instanceof Date && Number.isFinite(value.getTime())) value = value.toISOString().slice(0, 10);
+    if (value instanceof Date && Number.isFinite(value.getTime())) value = Utilities.formatDate(value, Book.open().getSpreadsheetTimeZone(), 'yyyy-MM-dd');
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new OperatorError('Choose a valid date in YYYY-MM-DD format.');
     const date = new Date(value + 'T12:00:00Z');
     if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) throw new OperatorError('Choose a real calendar date.');
