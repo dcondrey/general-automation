@@ -1,5 +1,4 @@
 const Template = {
-  START: ['Step', 'Status / link', 'What to do'],
   PREVIEW: ['Section', 'Content'],
   DASHBOARD: ['Measure', 'Value', 'Reading this correctly'],
 
@@ -15,7 +14,7 @@ const Template = {
     Book.sheet('Dashboard', Template.DASHBOARD);
     ['Backlog', 'Demo backlog'].forEach(Template.inputs);
     const result = Template.refresh(false);
-    Book.open().setActiveSheet(Book.sheet('Start here', Template.START));
+    DiscoveryHome.open();
     return { summary: 'Setup complete. Demo and your own backlog are kept separately. ' + result.summary };
   },
 
@@ -41,7 +40,7 @@ const Template = {
     Template.style(sh, true);
     sh.setColumnWidth(2, 320);
     sh.setColumnWidth(16, 360);
-    sh.getRange(2, 1, Book.MAX_ROWS, Backlog.HEADERS.length - 1).setBackground('#fff8e6');
+    sh.getRange(2, 1, Math.max(25, sh.getLastRow() - 1), Backlog.HEADERS.length - 1).setBackground('#fff8e6');
     const bounds = { 4: [0, 100000], 5: [0, 10080], 6: [1, 10000], 7: [0, 100], 8: [0, 10080], 11: [0, 100], 12: [0.01, 100000], 14: [0, 100000], 17: [0, 10080] };
     Object.keys(bounds).forEach(c => sh.getRange(2, Number(c), Book.MAX_ROWS, 1).setDataValidation(
       SpreadsheetApp.newDataValidation().requireNumberBetween(bounds[c][0], bounds[c][1]).setAllowInvalid(false).build()));
@@ -49,6 +48,9 @@ const Template = {
       SpreadsheetApp.newDataValidation().requireValueInList(c === 13 ? ['Planned', 'In progress', 'Live', 'Paused'] : ['Yes', 'No', 'Unsure'], true).setAllowInvalid(false).build()));
     sh.getRange(2, 15, Book.MAX_ROWS, 1).setNumberFormat('yyyy-mm-dd');
     const notes = {
+      1: 'Which team does this work? For example: Supply chain, Catalog, or Finance.',
+      2: 'Describe one repetitive process. For example: copy inventory totals into a second report.',
+      3: 'Who can confirm the steps and time estimate? A name or team role is fine.',
       4: 'How many times the whole process runs each week.',
       5: 'Minutes each participating person spends per run; exclude rework.',
       6: 'People spending the minutes above on each run. Blank means 1.',
@@ -83,8 +85,7 @@ const Template = {
     Template.dashboard(result, opts);
     Report.preview(result, opts);
     Template.start(result, opts);
-    ['Issues', 'Report preview', 'Run log', 'Settings', 'Start here'].forEach(name => Template.style(Book.open().getSheetByName(name), name === 'Settings'));
-    Book.open().getSheetByName('Start here').setColumnWidth(3, 650);
+    ['Issues', 'Report preview', 'Run log', 'Settings'].forEach(name => Template.style(Book.open().getSheetByName(name), name === 'Settings'));
     Book.open().getSheetByName('Report preview').setColumnWidth(2, 900);
     Book.open().getSheetByName('Report preview').getDataRange().setWrap(true);
     Book.open().getSheetByName('Settings').setColumnWidth(1, 220);
@@ -94,19 +95,7 @@ const Template = {
   },
 
   start(result, opts) {
-    const formId = Book.state('formId');
-    const reportId = Book.state('reportId');
-    Book.replace('Start here', Template.START, [
-      ['1. Try the demo', opts.source === 'Demo' ? 'DEMO — fictional data' : 'MY BACKLOG — your data', 'Automations → Rank my backlog. Read Ranked, Dashboard, and Report preview.'],
-      ['2. Set your assumptions', 'Settings', 'Change the yellow values. Potential savings are estimates; annual value is capacity, not cash.'],
-      ['3. Add your own work', 'Backlog', 'Choose My backlog in Settings. Fill in the yellow columns or use the optional intake Form. Keep each process unique; avoid overlapping hours.'],
-      ['4. Optional Google files', opts.files ? 'Enabled' : 'Preview mode — no Form or Doc creation', 'Set Create Google files to Yes only when ready. Menu actions ask before creating files. Google may require consent for Forms and Docs.'],
-      ['5. Collect submissions', formId ? 'https://docs.google.com/forms/d/' + formId + '/edit' : 'Not created', 'Automations → Create intake form. Review its questions, publish it in Google Forms, and choose who may respond. Rank my backlog imports new responses.'],
-      ['6. Fix incomplete rows', result.issues.length ? result.issues.length + ' rows need attention' : 'No row errors', 'Issues names the source row and what to fix. Edit the source row and rank again. Invalid rows are excluded from totals and the report says so.'],
-      ['7. Share the discovery brief', reportId ? 'https://docs.google.com/document/d/' + reportId + '/edit' : 'Preview is ready', 'Read Report preview. Automations → Make discovery report creates or refreshes one dedicated Doc. Share it yourself.'],
-      ['8. Measure after launch', 'Backlog → Status, Measured hours/week saved, Measured on', 'Enter observed weekly savings only after launch. Set Status to Live and record the measurement date. The chart keeps estimates and observations separate.'],
-      ['Need help?', 'Automations → Fix setup problems', 'Read the operator guide in the GitHub repository. No script editor is needed after installation.'],
-    ]);
+    DiscoveryHome.render(result, opts);
   },
 
   dashboard(result, opts) {
@@ -142,7 +131,7 @@ const Template = {
   doctor() {
     const opts = Settings.read();
     const expected = { 'Backlog': Backlog.HEADERS, 'Demo backlog': Backlog.HEADERS, 'Ranked': Backlog.OUTPUT,
-      'Settings': Settings.HEADERS, 'Issues': Backlog.ISSUES, 'Run log': RunLog.HEADERS, 'Start here': Template.START, 'Report preview': Template.PREVIEW, 'Dashboard': Template.DASHBOARD };
+      'Settings': Settings.HEADERS, 'Issues': Backlog.ISSUES, 'Run log': RunLog.HEADERS, 'Report preview': Template.PREVIEW, 'Dashboard': Template.DASHBOARD };
     const missing = Object.keys(expected).filter(name => !Book.open().getSheetByName(name));
     if (missing.length) throw new OperatorError('Missing tabs: ' + missing.join(', ') + '. Run Set up workbook to restore missing tabs.');
     Object.keys(expected).forEach(name => Book.sheet(name, expected[name]));

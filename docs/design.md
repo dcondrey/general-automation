@@ -10,7 +10,13 @@ Needed? = No removes the whole baseline. Needed? = Unsure or unresolved redesign
 
 Net weekly benefit is gross removable hours less weekly upkeep, floored at zero. Build effort includes implementation, rollout, training, and handoff. Rank descending by net benefit per build hour, then net hours, then source row. Payback is undefined when benefit is zero. Annual capacity value assumes constant workload and cost across the configured working weeks; it does not estimate layoffs, recovered revenue, or a cash budget reduction.
 
-Potential includes live processes. The next-three list excludes Live and Paused entries. Measured savings are independent observations for Live rows with a date and cannot exceed the baseline. This release supports one current observation per process, not a longitudinal causal study.
+Detailed portfolio potential includes live processes. The Start here potential card, Priorities list, and next-three list exclude Live and Paused entries, so delivered work does not appear as an additional opportunity. Measured savings are independent observations for Live rows with a date and cannot exceed the baseline. This release supports one current observation per process, not a longitudinal causal study.
+
+## Operator view
+
+Four tabs are visible by default: Start here, Priorities, Backlog, and Settings. Start here presents the selected data source, four summary cards, and three recommendations. Backlog initially exposes the seven required inputs; optional fields and their values remain intact behind the detailed-view menu. Issues appears automatically when a source row needs attention. Detailed calculations, the report preview, demo inputs, and run log are available through the menu.
+
+The data-source actions change one setting and regenerate output; neither action deletes input rows or enables file creation. The layout migration runs once per workbook revision when opened. It rebuilds owned output and changes visibility without changing source values, settings, or saved Form and Doc identities. Its version is recorded only after the layout is complete, so an interrupted migration can be retried.
 
 ## Overlap and missing evidence
 

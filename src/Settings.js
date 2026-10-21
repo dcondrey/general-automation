@@ -49,4 +49,12 @@ const Settings = {
     if (opts.source === 'Demo') throw new OperatorError('Choose My backlog in Settings before creating files. The demo stays inside this workbook.');
     return opts;
   },
+
+  chooseSource(value) {
+    Backlog.choice(value, 'Data source', ['Demo', 'My backlog']);
+    const rows = Book.read('Settings', Settings.HEADERS);
+    const index = rows.findIndex(row => row[0] === 'Data source');
+    if (index < 0) throw new OperatorError('Run Set up workbook before choosing a data source.');
+    Book.open().getSheetByName('Settings').getRange(index + 2, 2).setValue(value);
+  },
 };

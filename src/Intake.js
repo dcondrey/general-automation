@@ -54,7 +54,7 @@ const Intake = {
       }
     });
     form.setDescription('Tell us about repetitive work. Submit one process at a time. Estimates are fine; choose Unsure when the purpose or design needs discovery. Never enter passwords, tokens, or customer records.')
-      .setConfirmationMessage('Saved. The workbook owner will import submissions when they choose Rank my backlog.')
+      .setConfirmationMessage('Saved. The workbook owner will import submissions when they choose Refresh priorities.')
       .setCollectEmail(false).setAllowResponseEdits(false).setPublishingSummary(false);
     Book.state('formReady', 'yes');
     Template.refresh(false);

@@ -149,3 +149,51 @@ test('operators see actionable validation errors while raw service failures are 
   assert.match(failure, /could not finish/);
   assert.doesNotMatch(failure, /Injected/);
 });
+
+test('default view contains four useful tabs and keeps calculations and sample inputs out of the way', () => {
+  const { env } = ready();
+  assert.deepEqual([...env.ss.sheets.values()].filter(s => !s.hidden).map(s => s.name).sort(), ['Backlog', 'Priorities', 'Settings', 'Start here']);
+  assert.deepEqual([...env.ss.sheets.keys()].slice(0, 4), ['Start here', 'Priorities', 'Backlog', 'Settings']);
+  const home = env.ss.sheets.get('Start here');
+  assert.equal(home.data[0][0], 'Find your next three time savers');
+  assert.match(home.data[2][0], /DEMO/);
+  assert.equal(home.data[7][2], '14.0 h/week');
+  assert.equal(env.ss.sheets.get('Priorities').getLastRow(), 6);
+  assert.ok(!env.ss.sheets.get('Priorities').data.some(row => row[1] === 'Assemble weekly client reports'));
+  assert.ok(env.ss.sheets.get('Backlog').hiddenColumns.has(19));
+  assert.ok(!env.ss.sheets.get('Backlog').hiddenColumns.has(9));
+});
+
+test('own-data and demo actions preserve both datasets and never enable file creation', () => {
+  const { env, useOwnBacklog, useDemoBacklog, Book, Backlog, Demo } = ready();
+  Book.append('Backlog', Backlog.HEADERS, [Demo.rows()[1]]);
+  useOwnBacklog();
+  assert.match(env.ss.sheets.get('Start here').data[2][0], /YOUR WORK/);
+  assert.equal(Book.read('Priorities', ['Rank', 'Opportunity', 'Next step', 'Potential hours/week', 'Effort hours', 'Owner']).length, 1);
+  useDemoBacklog();
+  assert.equal(Book.read('Backlog', Backlog.HEADERS).length, 1);
+  assert.equal(Book.read('Demo backlog', Backlog.HEADERS).length, 6);
+  assert.equal(env.forms.size, 0); assert.equal(env.docs.size, 0);
+});
+
+test('detailed view is reversible and row errors surface an actionable Issues tab', () => {
+  const { env, showDiscoveryDetails, hideDiscoveryDetails, Template } = ready();
+  showDiscoveryDetails(); assert.equal(env.ss.sheets.get('Ranked').hidden, false); assert.equal(env.ss.sheets.get('Backlog').hiddenColumns.size, 0);
+  hideDiscoveryDetails(); assert.equal(env.ss.sheets.get('Ranked').hidden, true);
+  env.ss.sheets.get('Demo backlog').data[1][3] = 'invalid';
+  Template.refresh(false); assert.equal(env.ss.sheets.get('Issues').hidden, false);
+  assert.match(env.ss.sheets.get('Start here').data[26][0], /1 rows need attention/);
+});
+
+test('upgrading an existing workbook preserves inputs, observations and Google resource identity', () => {
+  const { env, DiscoveryHome, Book, Backlog, Demo } = ready();
+  Book.append('Backlog', Backlog.HEADERS, [Demo.rows()[3]]);
+  Book.state('layoutVersion', 'old'); Book.state('formId', 'keep-form'); Book.state('reportId', 'keep-doc');
+  const before = JSON.stringify(Book.read('Backlog', Backlog.HEADERS));
+  DiscoveryHome.upgrade();
+  assert.equal(JSON.stringify(Book.read('Backlog', Backlog.HEADERS)), before);
+  assert.equal(Book.state('formId'), 'keep-form'); assert.equal(Book.state('reportId'), 'keep-doc');
+  assert.equal(Book.state('layoutVersion'), DiscoveryHome.VERSION);
+  assert.equal(env.ss.sheets.get('Start here').data[32][0], 'Open intake Form editor →');
+  assert.equal(env.ss.sheets.get('Start here').data[32][4], 'Open discovery report →');
+});

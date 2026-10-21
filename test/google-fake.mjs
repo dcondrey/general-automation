@@ -16,11 +16,22 @@ export function googleFake() {
     }
     getValues() { return Array.from({ length: this.height }, (_, r) => Array.from({ length: this.width }, (_, c) => this.sheet.data[this.row + r - 1]?.[this.col + c - 1] ?? '')); }
     clearContent() { return this.setValues(Array.from({ length: this.height }, () => Array(this.width).fill(''))); }
+    clear() { return this.clearContent(); }
+    setValue(value) { this.sheet.data[this.row - 1] ||= []; this.sheet.data[this.row - 1][this.col - 1] = typeof value === 'string' && value.startsWith("'") ? value.slice(1) : value; return this; }
+    merge() { return this; }
+    breakApart() { return this; }
+    setRichTextValue(value) { return this.setValue(value.text); }
     setFormula(formula) { this.sheet.formulas.set(`${this.row}:${this.col}`, formula); return this.setValues([[formula]]); }
   }
-  for (const name of ['setBackground', 'setFontColor', 'setFontWeight', 'setWrap', 'setFontFamily', 'setVerticalAlignment', 'setDataValidation', 'setNote', 'setNumberFormat']) Range.prototype[name] = function () { return this; };
+  for (const name of ['setBackground', 'setFontColor', 'setFontWeight', 'setWrap', 'setFontFamily', 'setFontSize', 'setVerticalAlignment', 'setHorizontalAlignment', 'setDataValidation', 'setNote', 'setNumberFormat']) Range.prototype[name] = function () { return this; };
   class Sheet {
-    constructor(name) { Object.assign(this, { name, data: [], maxRows: 1000, charts: [], protections: [], formulas: new Map() }); }
+    constructor(name) { Object.assign(this, { name, data: [], maxRows: 1000, charts: [], protections: [], formulas: new Map(), hidden: false, hiddenColumns: new Set() }); }
+    getSheetId() { return [...ss.sheets.keys()].indexOf(this.name); }
+    showSheet() { this.hidden = false; return this; }
+    hideSheet() { this.hidden = true; return this; }
+    showColumns(start, count = 1) { for (let c = start; c < start + count; c++) this.hiddenColumns.delete(c); return this; }
+    hideColumns(start, count = 1) { for (let c = start; c < start + count; c++) this.hiddenColumns.add(c); return this; }
+    setActiveSelection() { return this; }
     getLastRow() { let i = this.data.length; while (i && !(this.data[i - 1] || []).some(v => v !== '' && v !== null && v !== undefined)) i--; return i; }
     getLastColumn() { return Math.max(0, ...Array.from(this.data, row => { if (!row) return 0; let i = row.length; while (i && (row[i - 1] === '' || row[i - 1] === undefined)) i--; return i; })); }
     getMaxRows() { return this.maxRows; }
@@ -45,9 +56,10 @@ export function googleFake() {
     newChart() { const builder = {}; for (const name of ['setChartType', 'addRange', 'setNumHeaders', 'setPosition', 'setOption']) builder[name] = () => builder; builder.build = () => ({}); return builder; }
     insertChart(chart) { this.charts.push(chart); }
   }
-  for (const name of ['setFrozenRows', 'setTabColor', 'setRowHeight', 'setColumnWidths', 'setColumnWidth']) Sheet.prototype[name] = function () { return this; };
-  const ss = { id: 'original', sheets: new Map(), getId() { return this.id; }, getName() { return 'Test Discovery'; }, getSheetByName(name) { return this.sheets.get(name) || null; },
-    insertSheet(name) { const sh = new Sheet(name); this.sheets.set(name, sh); return sh; }, setActiveSheet() {}, toast() {} };
+  for (const name of ['setFrozenRows', 'setFrozenColumns', 'setHiddenGridlines', 'setTabColor', 'setRowHeight', 'setRowHeights', 'setColumnWidths', 'setColumnWidth']) Sheet.prototype[name] = function () { return this; };
+  const ss = { id: 'original', sheets: new Map(), getId() { return this.id; }, getUrl() { return 'https://docs.google.com/spreadsheets/d/' + this.id + '/edit'; }, getName() { return 'Test Discovery'; }, getSheetByName(name) { return this.sheets.get(name) || null; },
+    insertSheet(name) { const sh = new Sheet(name); this.sheets.set(name, sh); return sh; }, getActiveSheet() { return this.active || [...this.sheets.values()][0]; },
+    setActiveSheet(sh) { this.active = sh; }, moveActiveSheet(position) { const entries = [...this.sheets.entries()].filter(([name]) => name !== this.active.name); entries.splice(position - 1, 0, [this.active.name, this.active]); this.sheets = new Map(entries); }, toast() {} };
   const validation = () => { const b = {}; for (const name of ['requireValueInList', 'setAllowInvalid', 'requireNumberBetween', 'requireTextLengthLessThanOrEqualTo', 'setHelpText']) b[name] = () => b; b.build = () => ({}); return b; };
   const ui = { ButtonSet: { OK: 'OK', YES_NO: 'YES_NO' }, Button: { YES: 'YES' }, alert(...args) { env.alerts.push(args); return 'YES'; } };
   class Item {
@@ -75,7 +87,7 @@ export function googleFake() {
     for (const name of ['setMarginTop', 'setMarginBottom', 'setMarginLeft', 'setMarginRight', 'setFontFamily', 'setFontSize', 'setSpacingAfter', 'setHeading']) body[name] = () => body;
     return body; };
   const services = {
-    SpreadsheetApp: { getActiveSpreadsheet: () => ss, getUi: () => ui, newDataValidation: validation, ProtectionType: { SHEET: 'sheet' } },
+    SpreadsheetApp: { getActiveSpreadsheet: () => ss, getUi: () => ui, newDataValidation: validation, newRichTextValue: () => ({ text: '', setText(t) { this.text = t; return this; }, setLinkUrl() { return this; }, build() { return this; } }), ProtectionType: { SHEET: 'sheet' } },
     Charts: { ChartType: { BAR: 'bar' } },
     PropertiesService: { getDocumentProperties: () => ({ getProperty: key => env.props.get(key) ?? null, setProperty: (key, val) => env.props.set(key, val) }), getUserProperties: () => ({ getProperty: key => env.userProps.get(key) ?? null, setProperty: (key, val) => env.userProps.set(key, val) }) },
     LockService: { getDocumentLock: () => ({ tryLock() { if (env.held) return false; env.held = true; return true; }, releaseLock() { env.held = false; env.released++; } }) },

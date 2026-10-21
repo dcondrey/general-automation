@@ -6,8 +6,8 @@ import vm from 'node:vm';
 for (const suite of ['discovery', 'marketplace', 'sorter', 'handoffs']) {
   test(suite + ' bundle exposes every menu action and only its intended service scopes', () => {
     const handlers = [];
-    const menu = { addItem(_label, handler) { handlers.push(handler); return this; }, addSeparator() { return this; }, addToUi() {} };
-    const context = vm.createContext({ console, SpreadsheetApp: { getUi: () => ({ createMenu: () => menu }) } });
+    const menu = { addItem(_label, handler) { handlers.push(handler); return this; }, addSubMenu() { return this; }, addSeparator() { return this; }, addToUi() {} };
+    const context = vm.createContext({ console, SpreadsheetApp: { getActiveSpreadsheet: () => null, getUi: () => ({ createMenu: () => menu }) } });
     const code = readFileSync(new URL('../dist/' + suite + '/Code.gs', import.meta.url), 'utf8');
     vm.runInContext(code, context); context.onOpen();
     assert.ok(handlers.length >= 4);

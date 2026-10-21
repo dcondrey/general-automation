@@ -69,6 +69,10 @@ All four can be built locally with `npm run build`. An installer runs `npm run s
 
 ## Automation Discovery Kit
 
+<p align="center"><img src="assets/discovery-preview.png" width="840" alt="The actual Google Sheets start page: a clearly labeled demo, four summary cards, and three recommendations with owners and estimated hours."></p>
+
+*Captured from the live Google Sheets workbook using fictional demo data.*
+
 ```mermaid
 flowchart LR
     A["Department intake Form<br/>or Backlog rows"] --> B["Validate inputs<br/>reconcile overlapping work"]
@@ -80,11 +84,14 @@ flowchart LR
 
 | Operator action | Result |
 | --- | --- |
-| **Set up workbook** | Creates missing tabs, input notes, dropdowns, demo rows, and a chart. Re-running preserves inputs and settings. |
-| **Rank my backlog** | Imports new Form submissions when enabled, checks each row, and refreshes rankings, dashboard, and report preview. |
-| **Create intake form** | Creates one unpublished Form for this workbook. Review access and publish it yourself in Google Forms. |
-| **Make discovery report** | Creates or refreshes one dedicated Google Doc from validated live data. Preview mode keeps the brief inside the workbook. |
-| **Fix setup problems** | Checks settings, headings, and the linked Form; names missing tabs and row errors. |
+| **Start here** | Shows the next three opportunities, baseline effort, remaining potential, measured savings, and rows to fix. |
+| **Use my own data** | Opens Backlog with seven essential fields. The demo remains separate. |
+| **Refresh priorities** | Checks inputs, imports Form submissions when enabled, and refreshes the recommendations and brief. |
+| **Return to the demo** | Switches to fictional examples without deleting your inputs. |
+| **More tools** | Previews a brief, creates an unpublished intake Form, or refreshes a dedicated report Doc when enabled. |
+| **View and setup** | Reveals optional fields and calculation tabs, restores the simple view, sets up the workbook, or diagnoses problems. |
+
+The default view has **four tabs**: Start here, Priorities, Backlog, and Settings. Backlog initially shows department, process, owner, frequency, minutes, whether the output is needed, and whether it needs redesign. Optional calculations, measurement fields, and diagnostics are available when needed. Hiding them preserves their values.
 
 The demo and real backlog live in different tabs. Setup starts with **Data source = Demo** and **Create Google files = No**. Switching to your own backlog leaves the demo intact. Creating Forms and Docs requires an explicit setting and a menu confirmation; nothing is emailed or shared automatically.
 
@@ -140,7 +147,7 @@ The Discovery bundle requests access to the **current spreadsheet**, **Google Fo
 
 Discovery data stays in your Google account. In Live mode, Marketplace Watch sends selected signal details to your Slack webhook, AI Sorter sends the selected feedback and labels to Gemini, and Team Handoffs sends the validated task inputs to Asana. Those services' account terms and access rules apply. Credentials are private to the Google login and workbook that saved them. Workbook editors can inspect and run the bound script. Forms and report Docs follow their own Google sharing permissions. One person should own intake imports and report refreshes unless the related files have been shared with the other operators.
 
-Each input tab supports up to **2,000 rows**; a Form supports **2,000 submissions per intake period** in this kit. Start a fresh workbook for a new period. Imports run when you choose **Rank my backlog**, not on a schedule. Keep imported rows and their Source IDs together: deleting an imported row makes that submission eligible for import again.
+Each input tab supports up to **2,000 rows**; a Form supports **2,000 submissions per intake period** in this kit. Start a fresh workbook for a new period. Imports run when you choose **Refresh priorities**, not on a schedule. Keep imported rows and their Source IDs together: deleting an imported row makes that submission eligible for import again.
 
 ## Library roadmap
 

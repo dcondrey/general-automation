@@ -5,7 +5,7 @@ import { join } from 'node:path';
 export const root = fileURLToPath(new URL('../', import.meta.url));
 const common = ['Book', 'RunLog', 'Operator'];
 export const bundles = {
-  discovery: { sources: common.concat(['Backlog', 'Settings', 'Demo', 'Template', 'Intake', 'Report', 'Main']) },
+  discovery: { sources: common.concat(['Backlog', 'Settings', 'Demo', 'Template', 'DiscoveryHome', 'Intake', 'Report', 'Main']) },
   marketplace: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Watch']), entry: 'Watch' },
   sorter: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Sorter']), entry: 'Sorter' },
   handoffs: { sources: common.concat(['Suite', 'Connections', 'Transport', 'Handoffs']), entry: 'Handoffs' },
