@@ -1,6 +1,6 @@
 # AI Sorter — operator guide
 
-Install with `npm run setup -- sorter` using the [developer guide](../../dev/README.md). Then choose **Automations → Set up workbook**. The bundle requests only the current spreadsheet, external requests, and the connection sidebar.
+Install with `npm run setup -- sorter` using the [installation guide](../installation.md). Then choose **Automations → Set up workbook**. The bundle requests only the current spreadsheet, external requests, and the connection sidebar.
 
 ## Try the baseline first
 
@@ -30,4 +30,4 @@ Changing source text, labels, or the prompt version creates a new request identi
 
 Fill **Golden set** with Source ID, exact feedback text, and a human-labeled expected category. Run the same examples through Feedback, then choose **Evaluate accuracy**. The evaluator uses matching current predictions only and reports missing/stale coverage. Classifier and keyword accuracy are calculated on the same matched examples. A tiny or unrepresentative set is not evidence of general quality. Review load and actual cost matter alongside accuracy.
 
-Live provider calls have not been claimed as production tested. See [validation](../validation.md). Primary references: [structured output](https://ai.google.dev/gemini-api/docs/structured-output), [token counting](https://ai.google.dev/gemini-api/docs/tokens), and [thinking controls](https://ai.google.dev/gemini-api/docs/thinking).
+Live provider calls have not been claimed as production tested. See [compatibility and limits](../compatibility.md). Primary references: [structured output](https://ai.google.dev/gemini-api/docs/structured-output), [token counting](https://ai.google.dev/gemini-api/docs/tokens), and [thinking controls](https://ai.google.dev/gemini-api/docs/thinking).

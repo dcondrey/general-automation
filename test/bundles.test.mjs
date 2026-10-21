@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
+const practices = JSON.parse(readFileSync(new URL('../best-practices.json', import.meta.url), 'utf8'));
+
 for (const suite of ['discovery', 'marketplace', 'sorter', 'handoffs']) {
   test(suite + ' bundle exposes every menu action and only its intended service scopes', () => {
     const handlers = [];
@@ -14,6 +16,7 @@ for (const suite of ['discovery', 'marketplace', 'sorter', 'handoffs']) {
     for (const name of handlers) assert.equal(typeof context[name], 'function', 'Missing entry point ' + name);
     assert.equal(typeof context.operatorAction_, 'function');
     const manifest = JSON.parse(readFileSync(new URL('../dist/' + suite + '/appsscript.json', import.meta.url), 'utf8'));
+    assert.deepEqual(manifest.oauthScopes.slice().sort(), practices.permissions[suite].map(scope => 'https://www.googleapis.com/auth/' + scope).sort());
     assert.ok(manifest.oauthScopes.includes('https://www.googleapis.com/auth/spreadsheets.currentonly'));
     assert.equal(manifest.webapp, undefined);
     assert.ok(!manifest.oauthScopes.some(s => /gmail|drive|scriptapp/.test(s)));

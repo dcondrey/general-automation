@@ -21,7 +21,7 @@ const driver = `<script>
 (async()=>{
   const wait=async(test,label)=>{const end=Date.now()+8000;while(!test()){if(Date.now()>end)throw Error('Timed out: '+label);await new Promise(resolve=>setTimeout(resolve,40));}};
   const click=text=>{const e=[...document.querySelectorAll('button')].find(e=>e.textContent===text);if(!e)throw Error('Button missing: '+text);e.click();};
-  const value=(selector,text)=>{const e=document.querySelector(selector);if(!e)throw Error('Field missing: '+selector);e.value=text;e.dispatchEvent(new Event('input',{bubbles:true}));};
+  const value=(selector,text)=>{const e=document.querySelector(selector);if(!e)throw Error('Field missing: '+selector);e.value=text;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));};
   const assert=(condition,message)=>{if(!condition)throw Error(message);};
   await wait(()=>state&&!busy,'initial snapshot');
   assert(state.demo&&state.items.length===6,'Demo did not load');
@@ -38,6 +38,35 @@ const driver = `<script>
   await wait(()=>!busy&&state&&!state.demo&&view==='overview','save retry');
   assert(state.items.length===1,'Retry duplicated the source process');
   assert(!document.querySelector('#content img')&&!document.body.dataset.xss,'User text was interpreted as HTML');
+  click('Processes');click('Edit process');
+  await wait(()=>!busy&&document.querySelector('#field-owner'),'process editor');
+  value('#field-owner','Catalog owner');value('#field-status','Paused');
+  document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&editing.preview,'edit preview');
+  value('#field-owner','Operations owner');
+  assert(!editing.preview&&[...document.querySelectorAll('button')].some(e=>e.textContent==='Preview changes'),'Changing a field did not invalidate the preview');
+  document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&editing.preview,'updated edit preview');
+  document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&document.getElementById('message').textContent.includes('connection was interrupted'),'lost edit acknowledgement');
+  document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&state.items[0].status==='Paused'&&!document.querySelector('form'),'edit retry');
+  assert(state.potential===0,'Paused process remained in the opportunity total');
+  value('[aria-label="Process status"]','In progress');
+  assert(!document.querySelector('article'),'Status filter kept a paused process');
+  value('[aria-label="Process status"]','Paused');
+  assert(document.querySelectorAll('article').length===1,'Status filter lost the paused process');
+  click('Edit process');await wait(()=>!busy&&document.querySelector('#field-status'),'resume editor');
+  value('#field-status','In progress');document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&editing.preview,'resume preview');document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&!document.querySelector('form'),'resume save');
+  click('Refresh workspace');await wait(()=>!busy&&state.issueCount===1,'invalid pasted input');
+  value('[aria-label="Process status"]','Needs attention');click('Fix process');
+  await wait(()=>!busy&&document.querySelector('#field-minutes'),'correction editor');
+  value('#field-minutes','45');document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&editing.preview,'correction preview');document.querySelector('form').requestSubmit();
+  await wait(()=>!busy&&state.issueCount===0&&!document.querySelector('form'),'source correction');
+  click('Overview');
   click('Plan next step');
   assert(document.querySelector('[data-view=plan]').getAttribute('aria-current')==='page','Plan navigation did not follow the editor');
   value('input[type=date]','2099-01-31');value('textarea','Verify source mappings with the owner.');
@@ -61,6 +90,8 @@ if (preview && (!process.argv[3] || !process.argv[3].endsWith('.png'))) throw Er
 const previewDriver = `<script>(async()=>{for(let i=0;i<200;i++){if(state&&!busy){document.body.dataset.workspaceCheck='passed';return;}await new Promise(resolve=>setTimeout(resolve,40));}document.body.dataset.workspaceError='Preview did not load';})()</script>`;
 const html = source.replace('<script>', bridge + '<script>').replace('</body>', (preview ? previewDriver : driver) + '</body>');
 let lostAcknowledgement = false;
+let lostEditAcknowledgement = false;
+let invalidatedInput = false;
 let interruptedMeasurement = false;
 const server = createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(html); return; }
@@ -79,6 +110,8 @@ const server = createServer(async (req, res) => {
     }
     const result = kit.workspaceRequest(action, payload);
     if (action === 'add' && result.ok && !lostAcknowledgement) { lostAcknowledgement = true; res.writeHead(503); res.end(); return; }
+    if (action === 'edit' && result.ok && !lostEditAcknowledgement) { lostEditAcknowledgement = true; res.writeHead(503); res.end(); return; }
+    if (action === 'edit' && result.ok && payload.status === 'In progress' && !invalidatedInput) { invalidatedInput = true; env.ss.sheets.get('Backlog').data[1][4] = '4,5'; }
     res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(result));
   } catch (_) { res.writeHead(400); res.end(); }
 });
@@ -100,8 +133,8 @@ try {
     throw Error(failure || 'Browser flow did not complete. Chrome status ' + code + '. ' + errors);
   }
   if (code !== 0) throw Error('The browser flow passed, but Chrome exited with status ' + code + '. ' + errors);
-  if (!preview && (!lostAcknowledgement || !interruptedMeasurement || kit.Book.read('Backlog', kit.Backlog.HEADERS).length !== 1 || kit.Workspace.history().length !== 1)) throw Error('Browser result disagrees with the saved source or history.');
-  console.log(preview ? 'Preview saved from the production interface with synthetic data.' : 'Browser flow passed: preview, lost-response retry, safe text rendering, action plan, and resumed measurement.');
+  if (!preview && (!lostAcknowledgement || !lostEditAcknowledgement || !invalidatedInput || !interruptedMeasurement || kit.Book.read('Backlog', kit.Backlog.HEADERS).length !== 1 || kit.Workspace.history().length !== 1)) throw Error('Browser result disagrees with the saved source or history.');
+  console.log(preview ? 'Preview saved from the production interface with synthetic data.' : 'Browser flow passed: intake, safe rendering, edits, status filters, invalid-row correction, lost-response retries, action plan, and resumed measurement.');
 } finally {
   server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
   await rm(profile, { recursive: true, force: true });

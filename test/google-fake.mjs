@@ -17,6 +17,7 @@ export function googleFake() {
       return this;
     }
     getValues() { return Array.from({ length: this.height }, (_, r) => Array.from({ length: this.width }, (_, c) => this.sheet.data[this.row + r - 1]?.[this.col + c - 1] ?? '')); }
+    getFormulas() { return Array.from({ length: this.height }, (_, r) => Array.from({ length: this.width }, (_, c) => this.sheet.formulas.get(`${this.row + r}:${this.col + c}`) || '')); }
     clearContent() { return this.setValues(Array.from({ length: this.height }, () => Array(this.width).fill(''))); }
     clear() { return this.clearContent(); }
     setValue(value) { this.sheet.data[this.row - 1] ||= []; this.sheet.data[this.row - 1][this.col - 1] = typeof value === 'string' && value.startsWith("'") ? value.slice(1) : value; return this; }

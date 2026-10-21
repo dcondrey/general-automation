@@ -10,7 +10,9 @@
   <a href="https://github.com/dcondrey/general-automation/actions/workflows/check.yml"><img src="https://img.shields.io/github/actions/workflow/status/dcondrey/general-automation/check.yml?branch=main&amp;style=flat-square&amp;label=CI&amp;labelColor=20232a" alt="CI"></a>
   <a href="https://developers.google.com/apps-script"><img src="https://img.shields.io/badge/Google-Apps_Script-007ec6?style=flat-square&amp;labelColor=20232a" alt="Google Apps Script"></a>
   <a href="docs/operators/discovery.md"><img src="https://img.shields.io/badge/operator-code_free-1abc9c?style=flat-square&amp;labelColor=20232a" alt="No code required after installation"></a>
-  <a href="dev/README.md"><img src="https://img.shields.io/badge/Node-24-007ec6?style=flat-square&amp;labelColor=20232a&amp;logo=nodedotjs&amp;logoColor=white" alt="Node 24 for development"></a>
+  <a href="docs/installation.md"><img src="https://img.shields.io/badge/Node-24-007ec6?style=flat-square&amp;labelColor=20232a&amp;logo=nodedotjs&amp;logoColor=white" alt="Node 24 for development"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/version-0.1.0_preview-64748b?style=flat-square&amp;labelColor=20232a" alt="Version 0.1.0 preview"></a>
+  <a href="best-practices.json"><img src="https://img.shields.io/badge/best_practices-JSON-1abc9c?style=flat-square&amp;labelColor=20232a" alt="Machine-readable best practices"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-007ec6?style=flat-square&amp;labelColor=20232a" alt="MIT license"></a>
 </p>
 
@@ -19,8 +21,8 @@
   <a href="#automation-discovery-kit">Discovery Kit</a> &middot;
   <a href="#how-the-numbers-work">The numbers</a> &middot;
   <a href="#what-is-different">What is different</a> &middot;
-  <a href="#library-roadmap">Roadmap</a> &middot;
-  <a href="#development">Development</a>
+  <a href="#best-practices">Best practices</a> &middot;
+  <a href="#install-from-source">Installation</a>
 </p>
 <!-- repo-header:end -->
 
@@ -38,13 +40,13 @@ Four independent templates cover discovery, marketplace exceptions, feedback tri
 | --- | --- |
 | Inspect real example outputs immediately | [Five generated demo outputs](examples/README.md) — no account or installation |
 | Try the workbook without writing code | [Installation and operator guide](docs/operators/discovery.md) |
-| Understand a recommendation | [Scoring and design decisions](docs/design.md) |
+| Understand a recommendation | [Calculations and decision rules](docs/calculations.md) |
 | Use the formulas in your own Sheet | [Formula cookbook](sheets/formulas.md) |
-| Check what has actually been verified | [Validation record](docs/validation.md) |
-| Install or extend the source | [Developer guide](dev/README.md) |
+| Check what has actually been verified | [Compatibility and limits](docs/compatibility.md) |
+| Install or extend the source | [Installation guide](docs/installation.md) |
 
 > [!NOTE]
-> These are implemented previews. The [validation record](docs/validation.md) separates local tests, uploaded Google bundles, and unverified live-service behavior. Public copy links follow real Google acceptance checks; API credentials and consent are never supplied by this repository.
+> These are implemented previews. The [compatibility guide](docs/compatibility.md) separates local tests, uploaded Google bundles, and unverified live-service behavior. Public copy links follow real Google acceptance checks; API credentials and consent are never supplied by this repository.
 
 Once a template is installed, operators use the **Automations** menu and yellow Settings cells. Optional service credentials go through the **Connections** sidebar. Routine work requires no script editing or package installation. Google account consent and your organization's access policies still apply.
 
@@ -57,7 +59,7 @@ Once a template is installed, operators use the **Automations** menu and yellow 
 | **AI Sorter** | Classifies feedback with Gemini, previews token costs, holds uncertain requests, flags human review, and compares labeled-set accuracy against a deterministic baseline. | [AI Sorter](docs/operators/sorter.md) | [Baseline fixture](examples/sorter-baseline.csv) |
 | **Team Handoffs** | Validates the next team's inputs, checks Asana source-task completion, creates the destination task, and reconciles unconfirmed writes without blindly creating duplicates. | [Handoffs](docs/operators/handoffs.md) | [Exact task payload](examples/handoff-preview.json) |
 
-All four can be built locally with `npm run build`. An installer runs `npm run setup -- discovery`, `marketplace`, `sorter`, or `handoffs` once; each gets a separate workbook and bound script. The [developer guide](dev/README.md) covers authorization. Routine operation happens in Sheets.
+All four can be built locally with `npm run build`. An installer runs `npm run setup -- discovery`, `marketplace`, `sorter`, or `handoffs` once; each gets a separate workbook and bound script. The [installation guide](docs/installation.md) covers authorization. Routine operation happens in Sheets.
 
 ### Decisions that survive real operational edge cases
 
@@ -71,7 +73,7 @@ All four can be built locally with `npm run build`. An installer runs `npm run s
 
 <p align="center"><img src="assets/workspace-preview.png" width="960" alt="The guided workspace: overview, process intake, action plan, and measurement navigation; recommendations explain the action, effort, and payback."></p>
 
-*Production workspace interface rendered in Chrome with synthetic examples. The [validation record](docs/validation.md) distinguishes browser checks from Google authorization and live service checks.*
+*Production workspace interface rendered in Chrome with synthetic examples. The [compatibility guide](docs/compatibility.md) distinguishes browser checks from Google authorization and live service checks.*
 
 ### Guided workspace
 
@@ -79,7 +81,8 @@ Choose **Automations → Open guided workspace**. Routine discovery can happen h
 
 1. **Add a process.** Answer seven plain-language questions, optionally refine the people, rework, upkeep, and overlap assumptions, then preview the recommendation before saving.
 2. **Plan the next step.** Give a process a specific next action and optional due date. Its owner and plan stay attached when source rows move; conflicting edits ask you to refresh.
-3. **Measure the result.** Record observed weekly savings, the measurement date, and supporting evidence. The process becomes Live, while earlier observations remain in history and never inflate the current total.
+3. **Correct and track the process.** Use **Processes** to change an owner, repair invalid inputs, or mark work In progress, Live, or Paused. Preview changes before saving to the existing row; its plan and history stay attached.
+4. **Measure the result.** Record observed weekly savings, the measurement date, and supporting evidence. The process becomes Live, while earlier observations remain in history and never inflate the current total.
 
 The overview also shows remaining opportunity by department. Switch between fictional examples and your own work inside the workspace. An unconfirmed save can be retried without duplicating a process or measurement; interrupted measurements have a **Finish interrupted save** action, with changed source data held for review.
 
@@ -94,7 +97,7 @@ flowchart LR
 
 | Operator action | Result |
 | --- | --- |
-| **Open guided workspace** | Guides intake, explains recommendations, saves next steps and dates, and records measured results with evidence. |
+| **Open guided workspace** | Guides intake, edits existing processes, explains recommendations, saves next steps, and records measured results with evidence. |
 | **Start here** | Shows the next three opportunities, baseline effort, remaining potential, measured savings, and rows to fix. |
 | **Use my own data** | Opens Backlog with seven essential fields. The demo remains separate. |
 | **Refresh priorities** | Checks inputs, imports Form submissions when enabled, and refreshes the recommendations and brief. |
@@ -150,7 +153,7 @@ The calculations, Forms intake, menus, and document generation are established t
 - Resume interrupted Form setup, deduplicate submission imports, and preserve source rows when derived output fails.
 - Keep measured results distinct from forecasts, and make invalid-row exclusions visible.
 
-[Prior art and comparison scope](docs/prior-art.md) links the reviewed projects and the tests behind these choices. It makes no claim that no other tool implements them or that a feature list proves universal superiority.
+[Related projects and comparison scope](docs/comparison.md) links the reviewed projects and the tests behind these choices. It makes no claim that no other tool implements them or that a feature list proves universal superiority.
 
 ## Permissions and limits
 
@@ -160,19 +163,13 @@ Discovery data stays in your Google account. In Live mode, Marketplace Watch sen
 
 Each input tab supports up to **2,000 rows**; a Form supports **2,000 submissions per intake period** in this kit. Start a fresh workbook for a new period. Imports run when you choose **Refresh priorities**, not on a schedule. Keep imported rows and their Source IDs together: deleting an imported row makes that submission eligible for import again.
 
-## Library roadmap
+## Best practices
 
-The four suites above are implemented. External-service acceptance still requires the operator's accounts and representative feeds. Further additions need a prior-art review, a demonstrable operator improvement, recovery tests, and a Google validation record.
+[best-practices.json](best-practices.json) provides the library's defaults, table limits, exact per-template permissions, and operating rules in a machine-readable format. Tests check the published defaults and permission lists against the actual bundles.
 
-| Extension | Candidate scope | Release gate |
-| --- | --- | --- |
-| Feed adapters | Approved marketplace exports and recurring reports | Preserve provenance and make partial/duplicate imports recoverable. |
-| AI extractors | Transcript actions and document fields | A representative labeled set, measured review load, schema checks, and operator approval. |
-| Platform scenarios | Make/Zapier handoffs and notifications | Import and execute an actual scenario with owned credentials before claiming it works. |
+Start in Demo, confirm process ownership, deduct upkeep, and reconcile overlap before relying on an estimate. Keep credentials in Connections, review uncertain results, and measure after rollout. Each operator guide explains the specific action to take when a save or external request is interrupted.
 
-The [full candidate map](docs/roadmap.md) accounts for the original 20 ideas. A generic rules engine, broad OAuth bundle, and speculative production integrations are outside v0.1.
-
-## Development
+## Install from source
 
 Use Node 24 (`.nvmrc`). Development tools are pinned in `package-lock.json`; the deployed Apps Script has no npm runtime dependencies.
 
@@ -185,7 +182,7 @@ npm run check
 
 `npm run check` checks Apps Script service types and source syntax, builds all four bundles, runs the regression suite, and verifies the generated examples. CI rejects stale output. Tests cover scoring boundaries, overlapping baselines, dated inbound, stale feeds, signal lifecycle, digest uncertainty, model schemas and token controls, Asana completion gates and reconciliation, formula injection, workbook identity, interrupted setup, and operator input preservation. Local service fakes do not verify Google's UI, OAuth, or external account access.
 
-`npm run check:browser` drives the production workspace interface in headless Chrome against synthetic service adapters. It tests the full intake → plan → measurement flow, an unconfirmed-save retry, and safe rendering of HTML-like user text. This is separate from Google runtime acceptance.
+`npm run check:browser` drives the production workspace interface in headless Chrome against synthetic service adapters. It tests intake → edit → plan → measurement, status filtering, unconfirmed-save retries, invalid-row correction, and safe rendering of HTML-like user text. This is separate from Google runtime acceptance.
 
 ```text
 src/                  Apps Script implementation and custom function
@@ -193,14 +190,15 @@ dist/                 Four independent bundles and their OAuth manifests
 examples/             Generated CSV/JSON outputs you can inspect on GitHub
 sheets/               Advanced formula examples
 docs/operators/       Instructions for the person using the workbook
-docs/                 Design, prior art, validation, and roadmap
+docs/                 Installation, calculations, comparisons, and limits
 dev/                  Build and installation tools
 test/                 Logic and service-boundary regression tests
-assets/               Transparent logo and 1280 × 640 social banner
+assets/               Transparent logo, screenshots, and social banner
+best-practices.json   Published defaults, permissions, and operating rules
 ```
 
-See the [developer guide](dev/README.md) for Google installation and the [contribution guide](CONTRIBUTING.md) for acceptance criteria.
+See the [installation guide](docs/installation.md) for Google installation and the [contribution guide](CONTRIBUTING.md) for acceptance criteria.
 
 ## License
 
-[MIT](LICENSE) · David Condrey
+[MIT](LICENSE) · David Condrey. Free to use, modify, and distribute, including commercially. Retain the copyright and license notice when distributing copies or substantial portions.

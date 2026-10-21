@@ -1,6 +1,6 @@
 # Sheets formula cookbook
 
-These formulas target the Discovery workbook's canonical columns. They are authored examples until marked executed in [validation](../docs/validation.md). Put exploratory formulas on a new tab so ranking does not replace them. Sheets uses English function names below; your locale may require semicolons between function arguments when pasting manually.
+These formulas target the Discovery workbook's canonical columns. They are authored examples until marked executed in [validation](../docs/compatibility.md). Put exploratory formulas on a new tab so ranking does not replace them. Sheets uses English function names below; your locale may require semicolons between function arguments when pasting manually.
 
 ## Department totals with QUERY
 

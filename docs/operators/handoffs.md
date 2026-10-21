@@ -1,6 +1,6 @@
 # Team Handoffs — operator guide
 
-Install with `npm run setup -- handoffs` using the [developer guide](../../dev/README.md). Choose **Automations → Set up workbook**. The bundle requests the current spreadsheet, external requests, and the connection sidebar.
+Install with `npm run setup -- handoffs` using the [installation guide](../installation.md). Choose **Automations → Set up workbook**. The bundle requests the current spreadsheet, external requests, and the connection sidebar.
 
 ## Preview the transfer
 
@@ -30,4 +30,4 @@ An existing Make/Zapier scenario can populate a Handoffs row from a completed up
 
 For failures, inspect **Run log**, **Preview**, and the specific ledger state. Check permissions and IDs for authorization errors. Inspect Asana before retrying an unknown write. No schedule or public webhook is installed.
 
-Primary references: [create task](https://developers.asana.com/reference/createtask), [get a task](https://developers.asana.com/reference/gettask), [project tasks](https://developers.asana.com/reference/gettasksforproject), and [pagination](https://developers.asana.com/docs/pagination). Live-account acceptance is tracked in [validation](../validation.md).
+Primary references: [create task](https://developers.asana.com/reference/createtask), [get a task](https://developers.asana.com/reference/gettask), [project tasks](https://developers.asana.com/reference/gettasksforproject), and [pagination](https://developers.asana.com/docs/pagination). Live-account acceptance is tracked in [compatibility and limits](../compatibility.md).

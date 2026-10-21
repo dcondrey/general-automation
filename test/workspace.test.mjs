@@ -192,3 +192,104 @@ test('RPC responses use serializable values and reject unsupported actions or lo
   assert.match(kit.workspaceRequest('add', { requestId: id(1), input: input() }).error, /Another automation/);
   assert.equal(kit.Book.read('Backlog', kit.Backlog.HEADERS).length, 0);
 });
+
+test('guided edits preserve stable identity, plans, and measurement history across sorting and retries', () => {
+  const kit = ready(), first = added(kit);
+  kit.Workspace.plan(plan(first)); kit.Workspace.measure(measurement(first));
+  kit.Workspace.add({ requestId: id(4), input: { ...input(), process: 'Another process' } });
+  const current = kit.Workspace.snapshot().items.find(item => item.ref.id === first.ref.id);
+  const payload = { requestId: id(5), ref: current.ref, input: { ...input(), owner: 'New owner', process: '=Literal process title' }, status: 'Live' };
+  const sourceRows = kit.env.ss.sheets.get('Backlog').data; [sourceRows[1], sourceRows[2]] = [sourceRows[2], sourceRows[1]];
+  const preview = kit.Workspace.previewEdit(payload);
+  assert.equal(preview.baseline, 7.5);
+  kit.Workspace.edit(payload); kit.Workspace.edit(payload);
+  const state = kit.Workspace.snapshot(), edited = state.items.find(item => item.ref.id === first.ref.id);
+  assert.equal(edited.owner, 'New owner'); assert.equal(edited.process, '=Literal process title');
+  assert.equal(edited.measured, 4); assert.equal(edited.plan.next, plan(first).next);
+  assert.equal(state.history.length, 1); assert.equal(state.history[0].process, first.process);
+  assert.equal(kit.Workspace.history().length, 1);
+  assert.equal(kit.Book.read('Backlog', kit.Backlog.HEADERS).length, 2);
+  assert.equal(kit.env.forms.size + kit.env.docs.size, 0);
+  assert.equal(kit.Settings.read().files, false);
+});
+
+test('invalid source rows can be corrected without touching another source or counting overlapping baselines', () => {
+  const kit = ready();
+  kit.Book.append('Backlog', kit.Backlog.HEADERS, [[...kit.Demo.rows()[0].slice(0, 18), '']]);
+  kit.env.ss.sheets.get('Backlog').data[1][3] = '1,000'; kit.env.settings('Data source', 'My backlog');
+  const state = kit.Workspace.snapshot(); assert.equal(state.items.length, 0); assert.equal(state.processes.length, 1);
+  assert.match(state.processes[0].issue, /without commas/);
+  const ref = state.processes[0].ref, details = kit.Workspace.process({ requestId: id(8), ref });
+  assert.equal(details.input.runs, '1,000');
+  const payload = { requestId: id(8), ref, input: { ...details.input, runs: '5' }, status: 'Planned' };
+  const demoBefore = JSON.stringify(kit.Book.read('Demo backlog', kit.Backlog.HEADERS));
+  kit.env.failWrite = 'Backlog'; assert.throws(() => kit.Workspace.edit(payload), /Injected/);
+  kit.Workspace.edit(payload); kit.Workspace.edit(payload);
+  assert.equal(kit.Workspace.snapshot().issueCount, 0);
+  assert.equal(kit.Book.read('Backlog', kit.Backlog.HEADERS)[0][18], 'manual:' + id(8));
+  assert.equal(JSON.stringify(kit.Book.read('Demo backlog', kit.Backlog.HEADERS)), demoBefore);
+  const existing = kit.Workspace.snapshot().processes[0];
+  kit.Workspace.add({ requestId: id(9), input: { ...input(), overlap: 'Shared time' } });
+  const overlapPayload = { requestId: id(10), ref: existing.ref, input: { ...details.input, runs: '5', overlap: 'shared time' }, status: 'Planned' };
+  assert.match(kit.Workspace.previewEdit(overlapPayload).warning, /excluded to prevent counting hours twice/);
+  kit.Workspace.edit(overlapPayload);
+  assert.equal(kit.Workspace.snapshot().items.length, 0); assert.equal(kit.Workspace.snapshot().processes.length, 2);
+  assert.equal(kit.Workspace.snapshot().baseline, 0);
+});
+
+test('edits reject stale or forged references, preserve blank defaults, and cannot overwrite later changes on replay', () => {
+  const kit = ready(), item = added(kit), payload = { requestId: id(6), ref: item.ref, input: { ...input(), people: '', effort: '', notes: '' }, status: 'Paused' };
+  const before = JSON.stringify(kit.Book.read('Backlog', kit.Backlog.HEADERS));
+  for (const status of ['Done', '', true]) assert.throws(() => kit.Workspace.edit({ ...payload, status }), /Status/);
+  assert.throws(() => kit.Workspace.edit({ ...payload, ref: { ...item.ref, source: 'Settings' } }), /Process source/);
+  assert.throws(() => kit.Workspace.edit({ ...payload, input: { ...input(), extra: 'injected' } }), /incomplete/);
+  assert.equal(JSON.stringify(kit.Book.read('Backlog', kit.Backlog.HEADERS)), before);
+  kit.Workspace.edit(payload); assert.equal(kit.Workspace.snapshot().potential, 0);
+  const row = kit.env.ss.sheets.get('Backlog').data[1];
+  assert.equal(row[5], ''); assert.equal(row[11], ''); assert.equal(row[15], '');
+  row[2] = 'Concurrent owner';
+  assert.throws(() => kit.Workspace.edit(payload), /changed since/);
+  assert.throws(() => kit.Workspace.previewEdit(payload), /changed since/);
+  assert.equal(row[2], 'Concurrent owner');
+});
+
+test('edits cannot invalidate recorded savings or race an interrupted measurement', () => {
+  const kit = ready(), item = added(kit); kit.Workspace.measure(measurement(item));
+  const live = kit.Workspace.snapshot().items[0], payload = { requestId: id(4), ref: live.ref, input: input(), status: 'Live' };
+  assert.throws(() => kit.Workspace.edit({ ...payload, status: 'Paused' }), /Set Status to Live/);
+  for (const minutes of [23.99, 24, 24.01]) {
+    const preview = () => kit.Workspace.previewEdit({ ...payload, input: { ...input(), minutes } });
+    if (minutes < 24) assert.throws(preview, /between 0 and/); else assert.doesNotThrow(preview);
+  }
+  kit.env.ss.sheets.get('Savings history').data[1][11] = 'Pending';
+  assert.throws(() => kit.Workspace.edit({ ...payload, input: { ...input(), owner: 'Changed' } }), /interrupted measurement/);
+  assert.equal(kit.Book.read('Backlog', kit.Backlog.HEADERS)[0][2], item.owner);
+});
+
+test('demo edits stay in the demo and saved changes survive a summary failure', () => {
+  const kit = ready(), process = kit.Workspace.snapshot().processes[0];
+  const { input } = kit.Workspace.process({ requestId: id(5), ref: process.ref });
+  const payload = { requestId: id(5), ref: process.ref, input: { ...input, owner: 'Demo owner' }, status: 'In progress' };
+  const before = JSON.stringify(kit.Book.read('Backlog', kit.Backlog.HEADERS));
+  kit.env.failWrite = 'Ranked'; assert.match(kit.Workspace.edit(payload).warning, /was saved/);
+  assert.equal(kit.Workspace.edit(payload).warning, '');
+  assert.equal(kit.Workspace.snapshot().demo, true);
+  assert.equal(JSON.stringify(kit.Book.read('Backlog', kit.Backlog.HEADERS)), before);
+  assert.equal(kit.Workspace.snapshot().processes[0].owner, 'Demo owner');
+});
+
+test('guided edits never replace spreadsheet formulas or transfer oversized source cells', () => {
+  const kit = ready(), item = added(kit), payload = { requestId: id(5), ref: item.ref, input: { ...input(), owner: 'Changed' }, status: 'Planned' };
+  const sh = kit.env.ss.sheets.get('Backlog'), before = JSON.stringify(sh.data);
+  sh.formulas.set('2:4', '=5');
+  assert.throws(() => kit.Workspace.process({ requestId: id(5), ref: item.ref }), /uses spreadsheet formulas/);
+  assert.throws(() => kit.Workspace.edit(payload), /uses spreadsheet formulas/);
+  assert.equal(JSON.stringify(sh.data), before); assert.equal(sh.formulas.get('2:4'), '=5');
+  sh.formulas.clear();
+  for (const length of [1999, 2000, 2001]) {
+    sh.data[1][15] = 'x'.repeat(length);
+    const ref = kit.Workspace.snapshot().processes[0].ref;
+    const read = () => kit.Workspace.process({ requestId: id(5), ref });
+    if (length <= 2000) assert.doesNotThrow(read); else assert.throws(read, /longer than 2,000/);
+  }
+});

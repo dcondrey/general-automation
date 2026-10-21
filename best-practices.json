@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "license": "MIT",
+  "defaults": {
+    "discovery": {
+      "dataSource": "Demo",
+      "createGoogleFiles": false
+    },
+    "externalSuites": {
+      "mode": "Demo"
+    }
+  },
+  "limits": {
+    "rowsPerTable": 2000,
+    "charactersPerCell": 2000
+  },
+  "permissions": {
+    "discovery": [
+      "spreadsheets.currentonly",
+      "forms",
+      "documents",
+      "script.container.ui"
+    ],
+    "marketplace": [
+      "spreadsheets.currentonly",
+      "script.external_request",
+      "script.container.ui"
+    ],
+    "sorter": [
+      "spreadsheets.currentonly",
+      "script.external_request",
+      "script.container.ui"
+    ],
+    "handoffs": [
+      "spreadsheets.currentonly",
+      "script.external_request",
+      "script.container.ui"
+    ]
+  },
+  "practices": [
+    {
+      "id": "remove-before-automating",
+      "rule": "Confirm who needs the output, remove redundant work, and redesign unclear processes before automating.",
+      "reference": "docs/calculations.md"
+    },
+    {
+      "id": "net-benefit",
+      "rule": "Deduct upkeep, include rollout and training effort, and withhold overlapping baselines before ranking savings.",
+      "reference": "docs/calculations.md"
+    },
+    {
+      "id": "observed-results",
+      "rule": "Keep forecasts separate from dated observations. Preserve zero results and never add repeated observations together.",
+      "reference": "docs/operators/discovery.md"
+    },
+    {
+      "id": "recoverable-writes",
+      "rule": "Keep stable process identities, reject stale edits, preserve operator inputs, and make interrupted saves safe to retry.",
+      "reference": "docs/operators/discovery.md"
+    },
+    {
+      "id": "private-connections",
+      "rule": "Enter credentials only in Connections. Bind them to the current Google user and workbook; keep them out of sheets and logs.",
+      "reference": "docs/installation.md"
+    },
+    {
+      "id": "uncertain-delivery",
+      "rule": "Hold unconfirmed Slack, paid-model, and Asana writes for review or reconciliation instead of blindly repeating them.",
+      "reference": "docs/compatibility.md"
+    },
+    {
+      "id": "human-review",
+      "rule": "Treat AI classifications as suggestions. Review uncertainty against labeled examples before relying on model output.",
+      "reference": "docs/operators/sorter.md"
+    },
+    {
+      "id": "minimum-permissions",
+      "rule": "Install independent workbooks with only the scopes declared for their suite and approve live actions explicitly.",
+      "reference": "docs/installation.md"
+    }
+  ]
+}

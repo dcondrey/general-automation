@@ -717,7 +717,7 @@ const Workspace = {
     return { source, row: index + 2, id: String(row[18] || ''), revision: Workspace.rowHash(row) };
   },
 
-  resolve(ref, requestId) {
+  locate(ref, requestId) {
     Workspace.reference(ref);
     const rows = Book.read(ref.source, Backlog.HEADERS), id = ref.id || 'manual:' + Workspace.requestId(requestId);
     const matches = rows.map((r, i) => r[18] === id ? i : -1).filter(i => i >= 0);
@@ -726,9 +726,14 @@ const Workspace = {
     if (index < 0 || !rows[index] || (!ref.id && !matches.length && rows[index][18])) throw new OperatorError('This process moved or was removed. Refresh the workspace before saving.');
     const row = rows[index].slice(), original = row.slice();
     if (!ref.id) original[18] = '';
-    if (Workspace.rowHash(original) !== ref.revision) throw new OperatorError('This process changed since you opened it. Refresh the workspace and review the new values before saving.');
     row[18] = id;
-    return { source: ref.source, index, row, id };
+    return { source: ref.source, index, row, id, revision: Workspace.rowHash(original) };
+  },
+
+  resolve(ref, requestId) {
+    const target = Workspace.locate(ref, requestId);
+    if (target.revision !== ref.revision) throw new OperatorError('This process changed since you opened it. Refresh the workspace and review the new values before saving.');
+    return target;
   },
 
   identify(target) {
@@ -760,10 +765,14 @@ const Workspace = {
       return { ref, process: r.process, department: r.department, owner: r.owner, status: r.status, action: r.action, baseline: r.hours, potential: r.saved, effort: r.build, payback: r.payback, measured: r.measured, reason: Workspace.reason(r), assumptions: r.assumptions,
         plan: plan ? { due: Workspace.day(plan[2], true), next: plan[3], revision: Book.hash(JSON.stringify(plan)) } : { due: '', next: '', revision: '' } };
     });
+    const processes = rows.map((row, index) => ({ row, index })).filter(({ row }) => row.some(v => v !== '' && v !== null)).map(({ row, index }) => ({
+      ref: Workspace.ref(source, row, index), process: String(row[1] || 'Untitled process').slice(0, 160), department: String(row[0] || '').slice(0, 100), owner: String(row[2] || '').slice(0, 100),
+      status: String(row[12] || 'Planned'), issue: result.issues.find(issue => issue[1] === index + 2)?.[3] || '',
+    }));
     const unresolved = plans.filter(p => p[4] === source && !items.some(item => item.ref.id === p[5])).length;
     return { source, demo: source === 'Demo backlog', today: new Date().toISOString().slice(0, 10), total: items.length, items, departments: [...departments.values()],
       baseline: summary.current, potential: items.filter(i => !['Live', 'Paused'].includes(i.status)).reduce((sum, i) => sum + (i.potential || 0), 0), measured: summary.measured,
-      issues: result.issues.map(r => ({ row: r[1], process: r[2], fix: r[3] })).slice(0, 20), issueCount: result.issues.length, unresolvedPlans: unresolved,
+      processes, issues: result.issues.map(r => ({ row: r[1], process: r[2], fix: r[3] })).slice(0, 20), issueCount: result.issues.length, unresolvedPlans: unresolved,
       history: history.filter(h => h[1] === source && h[11] === 'Done').slice(-10).reverse().map(h => ({ process: h[3], date: Workspace.day(h[4]), saved: Number(h[5]), evidence: h[6] })),
       pendingMeasurements: history.filter(h => h[1] === source && h[11] === 'Pending').length,
       pending: history.filter(h => h[1] === source && h[11] === 'Pending').slice(0, 20).map(h => ({ requestId: h[7], process: h[3], date: Workspace.day(h[4]), saved: Number(h[5]) })) };
@@ -781,6 +790,53 @@ const Workspace = {
   preview(value) {
     const r = Backlog.score(Backlog.item(Workspace.input(value), 2), Settings.read());
     return { action: r.action, baseline: r.hours, potential: r.saved, effort: r.build, payback: r.payback, reason: Workspace.reason(r), assumptions: r.assumptions };
+  },
+
+  process(payload) {
+    Workspace.object(payload, ['requestId', 'ref']);
+    Workspace.requestId(payload.requestId);
+    const target = Workspace.resolve(payload.ref, payload.requestId), row = target.row;
+    Workspace.editable(target);
+    const keys = ['department', 'process', 'owner', 'runs', 'minutes', 'people', 'errorRate', 'rework', 'needed', 'redesign', 'share', 'effort'];
+    const input = {};
+    keys.forEach((key, i) => { input[key] = String(row[i]); });
+    Object.assign(input, { notes: String(row[15]), upkeep: String(row[16]), overlap: String(row[17]) });
+    return { input, status: String(row[12] || 'Planned'), measured: row[13] !== '' || row[14] !== '' };
+  },
+
+  editable(target) {
+    const range = Book.open().getSheetByName(target.source).getRange(target.index + 2, 1, 1, Backlog.HEADERS.length);
+    if (range.getFormulas()[0].some(Boolean)) throw new OperatorError('This process uses spreadsheet formulas. Edit its source row directly so its formulas are kept.');
+    if (target.row.some(value => typeof value === 'string' && value.length > Book.MAX_TEXT)) throw new OperatorError('This process has a cell longer than 2,000 characters. Shorten it in the source workbook before opening the editor.');
+  },
+
+  editCandidate(payload) {
+    Workspace.object(payload, ['requestId', 'ref', 'input', 'status']);
+    const requestId = Workspace.requestId(payload.requestId), target = Workspace.locate(payload.ref, requestId);
+    Workspace.editable(target);
+    const row = Workspace.input(payload.input);
+    row[12] = Backlog.choice(payload.status, 'Status', ['Planned', 'In progress', 'Live', 'Paused']);
+    row[13] = target.row[13]; row[14] = target.row[14]; row[18] = target.id;
+    Backlog.score(Backlog.item(row, target.index + 2), Settings.read());
+    if (Workspace.history().some(h => h[1] === target.source && h[2] === target.id && h[11] === 'Pending')) throw new OperatorError('Finish this process’s interrupted measurement before changing its details.');
+    return { target, row };
+  },
+
+  previewEdit(payload) {
+    const { target, row } = Workspace.editCandidate(payload);
+    if (target.revision !== payload.ref.revision) throw new OperatorError('This process changed since you opened it. Refresh the workspace and review the new values before saving.');
+    const result = Workspace.preview(payload.input), rows = Book.read(target.source, Backlog.HEADERS);
+    rows[target.index] = row;
+    result.warning = Backlog.evaluate(rows, Settings.read(), target.source).issues.find(issue => issue[1] === target.index + 2)?.[3] || '';
+    return result;
+  },
+
+  edit(payload) {
+    const { target, row } = Workspace.editCandidate(payload);
+    if (Workspace.rowHash(target.row) === Workspace.rowHash(row) && target.revision !== payload.ref.revision) return Workspace.finish('These process changes were already saved.');
+    if (target.revision !== payload.ref.revision) throw new OperatorError('This process changed since you opened it. Refresh the workspace and review the new values before saving.');
+    Book.put(Book.open().getSheetByName(target.source).getRange(target.index + 2, 1, 1, Backlog.HEADERS.length), [row]);
+    return Workspace.finish('Process updated. Its identity, plan, and measurement history were kept.');
   },
 
   finish(message) {
@@ -879,7 +935,7 @@ function openAutomationWorkspace() {
 
 function workspaceRequest(action, payload) {
   try {
-    const handlers = { load: Workspace.snapshot, preview: Workspace.preview, add: Workspace.add, plan: Workspace.plan, measure: Workspace.measure, resume: Workspace.resume,
+    const handlers = { load: Workspace.snapshot, preview: Workspace.preview, add: Workspace.add, process: Workspace.process, previewEdit: Workspace.previewEdit, edit: Workspace.edit, plan: Workspace.plan, measure: Workspace.measure, resume: Workspace.resume,
       source: value => { Workspace.object(value, ['source']); Settings.chooseSource(Backlog.choice(value.source, 'Data source', ['Demo', 'My backlog'])); return Workspace.finish('Data source changed. Both input lists were kept.'); } };
     if (typeof action !== 'string' || !Object.prototype.hasOwnProperty.call(handlers, action)) throw new OperatorError('Choose a supported workspace action.');
     return { ok: true, data: Book.locked(() => handlers[action](payload)) };

@@ -1,6 +1,6 @@
 # Marketplace Watch — operator guide
 
-Install with `npm run setup -- marketplace` using the [developer guide](../../dev/README.md). Once installed, use **Automations → Set up workbook**. The bundle requests the current spreadsheet, external requests, and a connection sidebar; it does not request Forms, Docs, Gmail, or Drive access.
+Install with `npm run setup -- marketplace` using the [installation guide](../installation.md). Once installed, use **Automations → Set up workbook**. The bundle requests the current spreadsheet, external requests, and a connection sidebar; it does not request Forms, Docs, Gmail, or Drive access.
 
 ## Try the demo
 
@@ -33,4 +33,4 @@ Before a send, selected rows are marked **Unknown**. If acknowledgement is lost,
 
 Read the operator message and **Run log**. Fix missing SKUs, date formats, currencies, or sales windows in the source tab and run again. Keep old Signals while investigating. A Slack authorization error requires checking the webhook; an Unknown send requires checking the channel. There are no background triggers or automatic sharing operations.
 
-Live Slack delivery and representative marketplace feeds still require account-level acceptance; see [validation](../validation.md). Primary Slack behavior: [incoming webhooks](https://api.slack.com/messaging/webhooks).
+Live Slack delivery and representative marketplace feeds still require account-level acceptance; see [compatibility and limits](../compatibility.md). Primary Slack behavior: [incoming webhooks](https://api.slack.com/messaging/webhooks).

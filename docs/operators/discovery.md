@@ -4,7 +4,7 @@ Use this workbook to collect repetitive work, decide what should be removed or r
 
 ## Install once
 
-Template availability and live checks are recorded in [validation](../validation.md). Until a verified copy link is available, ask the person installing the template to follow the [developer setup](../../dev/README.md). After installation, all routine work happens in Sheets.
+Template availability and live checks are recorded in [compatibility and limits](../compatibility.md). Until a verified copy link is available, ask the person installing the template to follow the [installation guide](../installation.md). After installation, all routine work happens in Sheets.
 
 1. Open your own copy of the workbook. Reload it if the **Automations** menu is missing.
 2. Choose **Automations → View and setup → Set up workbook**. Review Google's consent request when shown. Your organization may require an administrator's approval.
@@ -19,14 +19,25 @@ Choose **Automations → Open guided workspace**. Google may ask for permission 
 
 - **Overview** explains the next three recommendations, their estimated effort and payback, and the remaining opportunity by department.
 - **Add a process** asks about the team, owner, task, frequency, time, purpose, and need for redesign. Optional fields cover people, rework, removable share, effort, upkeep, overlap, and notes. **Preview recommendation** shows the calculation before **Save to my Backlog** adds a row and selects your own data.
-- **Action plan** keeps a next step and optional target date with the source process. Past-due plans are labeled. Refreshing rankings keeps the plan; moving rows keeps their identity. Update the owner in the source Backlog if responsibility changes.
+- **Processes** shows every source process, including rows excluded from priorities. Search by process, team, or owner; filter by status or **Needs attention**. Choose **Fix process** or **Edit process**, correct the inputs, and preview before saving to the existing row. Changes keep the source identity, action plan, and measurement history. The preview warns when an overlap still excludes the process.
+- **Action plan** keeps a next step and optional target date with the source process. Past-due plans are labeled. Refreshing rankings keeps the plan; moving rows keeps their identity. Change the owner through Processes if responsibility changes.
 - **Measure results** asks for observed weekly savings, a date, evidence, and confirmation that the change is live. Zero is a valid result. Each observation remains in Savings history; only the current observation contributes to measured weekly savings.
 
-Use the data-source selector to switch between **Demo examples** and **My work**. Saving through Add a process always writes to your real Backlog; the preview and example filler do not save anything. Plans and measurements made while Demo is selected affect only the fictional demo. No workspace action creates a Form, Doc, notification, or external task.
+Use the data-source selector to switch between **Demo examples** and **My work**. Saving through Add a process always writes to your real Backlog; the preview and example filler do not save anything. Plans and measurements made while Demo is selected affect only the fictional demo. Editing while Demo is selected updates only the fictional demo. No workspace action creates a Form, Doc, notification, or external task.
 
 If a response is interrupted, keep the dialog open and retry the same save. It will not add a duplicate. A measurement interrupted after its history entry was saved appears under Measure results with **Finish interrupted save**. If its source changed meanwhile, the kit holds the measurement for review instead of overwriting the new values. Other editors' changes to a process or action plan require a refresh before saving.
 
-The dialog searches all valid processes, showing up to 100 matching cards at once. Narrow the search to find another process. Invalid or overlapping source rows remain in the workbook's Issues tab. **Show detailed tabs and fields** also reveals Action plan and Savings history; keep their identity and request columns intact.
+The dialog shows up to 100 matching cards at once. Narrow the search to find another process. **Processes** also includes invalid and overlapping rows, with the correction explained beside **Fix process**. Identity-column corruption, duplicate Source IDs, or damaged measurement fields require repair in the source workbook. **Show detailed tabs and fields** also reveals Action plan and Savings history; keep their identity and request columns intact.
+
+## Update work already collected
+
+Use **Processes → Edit process** to change an owner, baseline, purpose, estimates, or notes. **Preview changes** recalculates the recommendation; **Save changes** updates the existing row. Changing a field after preview requires another preview. A lost acknowledgement can be retried from the same editor; a concurrent source change requires a refresh.
+
+Choose **In progress** when the owner starts work. Choose **Paused** to remove an unlaunched process from remaining opportunity while retaining its inputs and plan. Choose **Live** after launch; this does not create a savings claim. Use **Measure results** to record the observed result with evidence.
+
+A process with a current observation must remain Live, and its revised baseline must cover that observation. Finish a pending measurement before changing that process. Current savings and their date cannot be cleared through the process editor; historical evidence is retained.
+
+Rows containing spreadsheet formulas must be edited in the source workbook. The editor refuses to replace a formula with its calculated value. A cell exceeding 2,000 characters must also be shortened there before opening the editor.
 
 ## Use your own work
 
@@ -79,7 +90,7 @@ Reveal the detailed fields. After an improvement launches, set **Status = Live**
 | --- | --- |
 | No menu | Reload the workbook in a desktop browser; confirm you have edit access and the script was installed. |
 | Google blocks authorization | Ask your Workspace administrator to review the requested Sheets, Forms, and Docs permissions. |
-| A row appears in Issues | Fix that row in Backlog or Demo backlog; do not edit the generated Issues row. Rank again. |
+| A row appears in Issues | Open Processes, filter Needs attention, choose Fix process, and preview your correction. Do not edit the generated Issues row. |
 | Another automation is running | Wait a moment and retry. Each workbook serializes its script mutations. |
 | A column heading changed | Undo the heading edit or restore it from the canonical list below. Input rows are retained. |
 | A Form or Doc is unavailable | Ask its creator to restore it or share it with you. Setup refuses to silently replace it. |

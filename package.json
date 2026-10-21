@@ -20,5 +20,14 @@
     "@types/google-apps-script": "2.0.13",
     "googleapis": "176.0.0",
     "typescript": "7.0.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcondrey/general-automation.git"
+  },
+  "homepage": "https://github.com/dcondrey/general-automation#readme",
+  "bugs": {
+    "url": "https://github.com/dcondrey/general-automation/issues"
   }
 }
